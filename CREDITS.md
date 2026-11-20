@@ -9,3 +9,5 @@
 | Các hiệu ứng âm thanh còn lại | Tổng hợp bằng WebAudio trong `src/web/audio.js` (không dùng file) | MIT (repo này) |
 | Mã nguồn, test, tài liệu | Viết cùng Claude Code (Anthropic, model Claude Opus 5.5), do tôi điều phối và kiểm chứng | MIT (repo này) |
 | Font | Font hệ thống (system-ui) | — |
+| Công cụ AI tạo nội dung | **Claude Code** (Anthropic, model Claude Opus 5.5) viết phần lớn mã nguồn, test, scenario, tài liệu, lời thoại Ông Đăng và thông báo trong game; người làm điều phối, review và kiểm chứng. Nhật ký: `docs/notes/ai-log.md` | — |
+| Công cụ đo / chụp | Google Chrome (DevTools Protocol) cho `scripts/bench.mjs` và `scripts/browser-check.mjs`; không đóng gói vào sản phẩm | — |

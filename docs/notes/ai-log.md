@@ -101,3 +101,32 @@ Stop hook [scripts/stop-hook.mjs](../../scripts/stop-hook.mjs) (chặn agent k�
 ### Token / chi phí (ước tính)
 - Ticket + ADR + sim + test + renderer + docs: ~45k token output; ngữ cảnh tích lũy Phase 3 ước tính ~3–4 triệu token input (phần lớn cache). Số chính xác: `/cost`.
 - Tiết kiệm: sửa file bằng script có `assert` (không đọc lại file lớn), dùng lại `proof.mjs` / `browser-check.mjs` của Phase 2, chỉ thêm 3 ảnh mới.
+
+## Phase 4
+
+### Lời nhắc chính
+1. Người dùng dán nguyên văn Ticket-04 → lưu `docs/specs/phase-4-ticket-04.md`.
+
+### Trình tự
+| Bước | Việc | Kết quả |
+|---|---|---|
+| 1 | Soak + đo bộ nhớ | RSS 1.26× → chẩn đoán heapUsed phẳng (không rò rỉ) → cờ V8 `--jitless --max-semi-space-size=1` → 1.05× |
+| 2 | Bảng xếp hạng (module + API server + `--export-leaderboard`); đổi `run_cmd` sang `node server.js` | 3 test |
+| 3 | Cờ `world.bench` trong sim (chỉ renderer bật), cảnh bench, `scripts/bench.mjs` (CDP) | bench chạy, thoát mã 0 |
+| 4 | Tối ưu bench: avg 44 → 66 FPS, p1 low 9 → 26 | xem lỗi #3–#5 |
+| 5 | Accessibility (đổi phím, phụ đề, mũi tên, giảm chuyển động, chữ lớn), UI bảng xếp hạng | ảnh 12–16 |
+| 6 | Đóng gói zip release, kiểm tra trong thư mục trống | 0 lỗi console |
+| 7 | README/CHANGELOG/CREDITS/AGENTS/retro | |
+
+### Lỗi của AI (và cách phát hiện / sửa)
+| # | Lỗi | Phát hiện | Sửa |
+|---|---|---|---|
+| 1 | Soak lần đầu RSS 1.26× — suýt kết luận "rò rỉ" hoặc nới cách đo | đo heapUsed sau GC qua 150 Đêm: phẳng | chọn cờ V8 hợp lệ, ghi rõ lý do + thêm `heap_used_*_mb` vào output |
+| 2 | Script Python sửa `soak.js` không ghi gì (so khớp chuỗi `\n` qua heredoc thất bại) | traceback | sửa bằng công cụ Edit |
+| 3 | Nghi đo RSS mỗi giây gây giật → chỉ đúng một phần | so có/không đo bộ nhớ | thủ phạm chính là bloom + CSS filter vẽ lại mỗi khung; vẫn giảm lấy mẫu RSS xuống mỗi 5 s (p1 low 9 → 26) |
+| 4 | Viền Bóng Mực 200 vỏ cầu trong suốt (overdraw) | đọc lại code khi tối ưu | viền đặc mặt sau |
+| 5 | Trùng tên biến `n` trong `sync()` khi thêm vẽ instanced | `node --check` | đổi thành `ns` |
+| 6 | Lệnh dừng các server nền bị chặn bởi bộ phân loại an toàn | lỗi quyền | dừng từng PID cụ thể do tôi khởi động / báo người dùng |
+
+### Token / chi phí (ước tính)
+- ~70k output; ngữ cảnh tích lũy Phase 4 ~5–7 triệu token input (phần lớn cache). Tổng 4 phase: xem [retro.md](retro.md#6-token--chi-phí-ước-tính).

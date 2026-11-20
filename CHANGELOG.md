@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.0.0 / phase-4 (Ticket-04 "Bình minh: phát hành v1.0.0", contract v1.3)
+- **Benchmark** `node scripts/bench.mjs --seed 42 --duration 30 --out bench.json`: cửa sổ Chrome 1280×720, vsync tắt, cảnh chuẩn (200 Bóng Mực, 100 đom đóm, L1–L3 sáng), camera bay vòng, đủ các trường của ticket.
+- **Soak** `node --expose-gc --jitless --max-semi-space-size=1 src/soak.js`: 10 Đêm trong một tiến trình, input ngẫu nhiên theo seed.
+- **Bảng xếp hạng cục bộ:** top 10, lưu `data/leaderboard.json`, màn hình từ menu, nhập tên sau Bình Minh/thua (hỗ trợ tiếng Việt), `node server.js --export-leaderboard out.json`.
+- **Accessibility:** đổi phím (phát hiện trùng, khôi phục mặc định), phụ đề/chỉ báo hình ảnh + mũi tên chỉ Bóng Mực mới, giảm chuyển động, chữ ≥ 18 px + chữ lớn ×1.25.
+- **Hiệu năng:** Bóng Mực vẽ bằng instanced mesh (5 draw call), bloom ở 1/4 độ phân giải, bỏ MSAA canvas thừa, bỏ CSS filter vẽ lại mỗi khung.
+- `run_cmd` đổi thành `node server.js` (để `--export-leaderboard` tới được script; `npm start` vẫn dùng được để chơi).
+- Release v1.0.0: `dao-den-long-v1.0.0.zip` (web tĩnh + server, không cần `npm install`).
+
 ## phase-3 (Ticket-03 "Đèn cạn dầu", contract v1.2)
 
 ### Phase 3 — Breaking changes
