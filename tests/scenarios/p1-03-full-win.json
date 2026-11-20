@@ -1,0 +1,269 @@
+{
+ "requirement": "PRD-0 core loop: gom 25 đom đóm, thắp đủ 5 Đèn Lồng -> thắng (all_lit), điểm = mote + lantern + thời gian + lửa",
+ "seed": 1,
+ "ticks": 4800,
+ "snapshot_every": 60,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "motes": [
+   [
+    0,
+    0,
+    4.14
+   ],
+   [
+    0,
+    0,
+    6.48
+   ],
+   [
+    0,
+    0,
+    8.82
+   ],
+   [
+    0,
+    0,
+    11.16
+   ],
+   [
+    0,
+    0,
+    13.5
+   ],
+   [
+    3.937,
+    0,
+    15.139
+   ],
+   [
+    6.163,
+    0,
+    13.522
+   ],
+   [
+    8.388,
+    0,
+    11.905
+   ],
+   [
+    10.614,
+    0,
+    10.288
+   ],
+   [
+    12.839,
+    0,
+    8.672
+   ],
+   [
+    15.615,
+    0,
+    0.933
+   ],
+   [
+    14.765,
+    0,
+    -1.683
+   ],
+   [
+    13.915,
+    0,
+    -4.299
+   ],
+   [
+    13.065,
+    0,
+    -6.915
+   ],
+   [
+    12.215,
+    0,
+    -9.531
+   ],
+   [
+    5.713,
+    0,
+    -14.562
+   ],
+   [
+    2.962,
+    0,
+    -14.562
+   ],
+   [
+    0.212,
+    0,
+    -14.562
+   ],
+   [
+    -2.539,
+    0,
+    -14.562
+   ],
+   [
+    -5.29,
+    0,
+    -14.562
+   ],
+   [
+    -12.084,
+    0,
+    -9.933
+   ],
+   [
+    -12.934,
+    0,
+    -7.317
+   ],
+   [
+    -13.784,
+    0,
+    -4.701
+   ],
+   [
+    -14.634,
+    0,
+    -2.085
+   ],
+   [
+    -15.484,
+    0,
+    0.531
+   ]
+  ]
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "move": [
+     0,
+     1
+    ],
+    "interact": false
+   },
+   {
+    "tick": 240,
+    "move": [
+     0,
+     0
+    ],
+    "interact": true
+   },
+   {
+    "tick": 241,
+    "move": [
+     0.80901,
+     -0.587795
+    ],
+    "interact": false
+   },
+   {
+    "tick": 524,
+    "move": [
+     0,
+     0
+    ],
+    "interact": true
+   },
+   {
+    "tick": 525,
+    "move": [
+     -0.309031,
+     -0.951052
+    ],
+    "interact": false
+   },
+   {
+    "tick": 808,
+    "move": [
+     0,
+     0
+    ],
+    "interact": true
+   },
+   {
+    "tick": 809,
+    "move": [
+     -1,
+     0
+    ],
+    "interact": false
+   },
+   {
+    "tick": 1092,
+    "move": [
+     0,
+     0
+    ],
+    "interact": true
+   },
+   {
+    "tick": 1093,
+    "move": [
+     -0.309031,
+     0.951052
+    ],
+    "interact": false
+   },
+   {
+    "tick": 1376,
+    "move": [
+     0,
+     0
+    ],
+    "interact": true
+   }
+  ]
+ },
+ "expect": {
+  "end_state": "won",
+  "end_ticks": 1377,
+  "end_score": 1334,
+  "events": [
+   {
+    "name": "lantern_lit",
+    "data": {
+     "lantern_id": "L1"
+    }
+   },
+   {
+    "name": "lantern_lit",
+    "data": {
+     "lantern_id": "L2"
+    }
+   },
+   {
+    "name": "lantern_lit",
+    "data": {
+     "lantern_id": "L3"
+    }
+   },
+   {
+    "name": "lantern_lit",
+    "data": {
+     "lantern_id": "L4"
+    }
+   },
+   {
+    "name": "lantern_lit",
+    "data": {
+     "lantern_id": "L5"
+    }
+   },
+   {
+    "name": "game_over",
+    "tick": 1377,
+    "data": {
+     "result": "won",
+     "reason": "all_lit"
+    }
+   }
+  ],
+  "no_events": [
+   "player_hit"
+  ]
+ }
+}

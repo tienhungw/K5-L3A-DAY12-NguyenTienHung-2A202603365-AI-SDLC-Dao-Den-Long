@@ -1,0 +1,14 @@
+{
+  "requirement": "PRD-0: phát xung sáng tốn pulse_cost đom đóm, làm choáng + đẩy Bóng Mực trong pulse_radius (+20/bóng), cooldown 1s",
+  "seed": 1, "ticks": 200, "snapshot_every": 1,
+  "scenario": { "random_motes": false, "random_shades": false, "player": { "carried": 3 },
+    "shades": [{ "id": "S1", "pos": [3.5, 1, 0] }, { "id": "S2", "pos": [0, 1, -2] }, { "id": "S3", "pos": [-12, 1, 0] }] },
+  "inputs": { "frames": [
+    { "tick": 0, "pulse": true }, { "tick": 1, "pulse": false },
+    { "tick": 10, "pulse": true }, { "tick": 11, "pulse": false }
+  ] },
+  "expect": {
+    "events": [{ "name": "pulse", "tick": 1, "data": { "stunned_ids": ["S1", "S2"] } }],
+    "player_pos_at": [{ "tick": 1, "pos": [0, 0, 0] }]
+  }
+}

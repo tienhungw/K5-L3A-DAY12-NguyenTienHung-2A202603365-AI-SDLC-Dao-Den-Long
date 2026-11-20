@@ -1,0 +1,6 @@
+{
+  "requirement": "Contract B/C: file inputs sai (tick trùng) -> exit code 2",
+  "seed": 1, "ticks": 10,
+  "inputs": { "frames": [{ "tick": 3, "move": [1, 0] }, { "tick": 3, "jump": true }] },
+  "expect_exit": 2
+}

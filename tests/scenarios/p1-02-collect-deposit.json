@@ -1,0 +1,20 @@
+{
+  "requirement": "PRD-0: nhặt đom đóm (pickup_radius), mang tối đa carry_capacity, nộp vào L1 trong interact_radius -> thắp đèn (+100)",
+  "seed": 1, "ticks": 300,
+  "scenario": { "random_motes": false, "random_shades": false,
+    "motes": [[0, 0, 2], [0, 0, 4], [0, 0, 6], [0.5, 0, 8], [-0.5, 0, 10], [0, 0, 12]] },
+  "inputs": { "frames": [
+    { "tick": 0, "move": [0, 1] },
+    { "tick": 230, "move": [0, 0] },
+    { "tick": 240, "interact": true }
+  ] },
+  "expect": {
+    "end_state": "playing", "end_score": 150,
+    "events": [
+      { "name": "mote_picked", "data": { "carried": 1 } },
+      { "name": "mote_picked", "data": { "carried": 5 } },
+      { "name": "deposit", "tick": 241, "data": { "lantern_id": "L1", "amount": 5, "deposited": 5 } },
+      { "name": "lantern_lit", "tick": 241, "data": { "lantern_id": "L1" } }
+    ]
+  }
+}

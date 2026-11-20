@@ -1,0 +1,9 @@
+{
+  "requirement": "PRD-0 'Bóng sợ đèn': Bóng Mực không vào safe_radius (3 m) quanh đèn đã thắp; đứng cạnh đèn là an toàn",
+  "seed": 1, "ticks": 1800, "snapshot_every": 3,
+  "scenario": { "random_motes": false, "random_shades": false,
+    "player": { "pos": [0, 0, 18] }, "lanterns": [{ "id": "L1", "lit": true }],
+    "shades": [{ "pos": [0, 1, 8] }, { "pos": [6, 1, 18] }, { "pos": [-1, 1, 19.5] }] },
+  "expect": { "end_state": "playing", "no_events": ["player_hit"],
+    "min_shade_dist_to": { "pos": [0, 0, 18], "gt": 3 } }
+}

@@ -1,0 +1,15 @@
+{
+  "requirement": "PRD-0: Bóng Mực đuổi theo, chạm mất 1 lửa (rơi hit_drop_ratio đom đóm), invuln_s 1.5s, hết lửa -> thua (no_flames)",
+  "seed": 1, "ticks": 600, "snapshot_every": 30,
+  "scenario": { "random_motes": false, "random_shades": false,
+    "player": { "carried": 4 }, "shades": [{ "pos": [3, 1, 0] }] },
+  "expect": {
+    "end_state": "lost", "end_ticks": 233,
+    "events": [
+      { "name": "player_hit", "tick": 53, "data": { "by": "shade", "flames": 2, "dropped": 2 } },
+      { "name": "player_hit", "tick": 143, "data": { "by": "shade", "flames": 1, "dropped": 1 } },
+      { "name": "player_hit", "tick": 233, "data": { "by": "shade", "flames": 0, "dropped": 0 } },
+      { "name": "game_over", "tick": 233, "data": { "result": "lost", "reason": "no_flames" } }
+    ]
+  }
+}

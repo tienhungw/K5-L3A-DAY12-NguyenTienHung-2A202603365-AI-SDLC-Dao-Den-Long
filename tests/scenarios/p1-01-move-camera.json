@@ -1,0 +1,18 @@
+{
+  "requirement": "Contract C: move [x,z] theo cam_yaw_deg, tốc độ player_speed (4.5 m/s), không rời đảo",
+  "seed": 1, "ticks": 180, "snapshot_every": 60,
+  "scenario": { "random_motes": false, "random_shades": false },
+  "inputs": { "frames": [
+    { "tick": 0, "move": [0, 1] },
+    { "tick": 60, "cam_yaw_deg": 90 },
+    { "tick": 120, "move": [1, 0], "cam_yaw_deg": 0 }
+  ] },
+  "expect": {
+    "end_state": "playing", "end_ticks": 180,
+    "player_pos_at": [
+      { "tick": 60, "pos": [0, 0, 4.5] },
+      { "tick": 120, "pos": [4.5, 0, 4.5] },
+      { "tick": 180, "pos": [9, 0, 4.5] }
+    ]
+  }
+}

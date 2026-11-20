@@ -1,0 +1,7 @@
+{
+  "requirement": "PRD-0/Contract: hết đêm (time_left_s về 0) -> thua, reason dawn",
+  "seed": 1, "ticks": 1000,
+  "scenario": { "random_motes": false, "random_shades": false, "time_left_s": 3 },
+  "expect": { "end_state": "lost", "end_ticks": 180, "end_score": 0,
+    "events": [{ "name": "game_over", "tick": 180, "data": { "result": "lost", "reason": "dawn" } }] }
+}
