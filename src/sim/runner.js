@@ -13,10 +13,10 @@ export function loadTuning() {
 }
 
 /** Runs a full headless simulation and returns the JSONL records (as objects). */
-export function runHeadless({ tuning, seed = 0, scenario = null, frames = [], ticks, every = 10 }) {
-  const w = createWorld(tuning, seed, scenario);
+export function runHeadless({ tuning, seed = 0, scenario = null, frames = [], ticks, every = 10, night = 1 }) {
+  const w = createWorld(tuning, seed, scenario, night);
   const inputAt = inputCursor(frames);
-  const out = [snapshot(w)];
+  const out = [snapshot(w), { type: 'event', tick: 0, name: 'night_start', data: { night } }];
   for (let k = 0; k < ticks; k++) {
     for (const e of step(w, inputAt(k))) out.push(e);
     const ended = w.state !== 'playing';

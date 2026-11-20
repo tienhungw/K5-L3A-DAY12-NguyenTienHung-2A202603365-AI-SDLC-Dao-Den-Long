@@ -18,7 +18,9 @@ export function parseVec(v, where) {
   return fail(`${where}: expected position [x, y, z]`);
 }
 
-const BUTTONS = ['jump', 'interact', 'pulse', 'dash'];
+const BUTTONS = ['jump', 'interact', 'pulse', 'dash', 'pause'];
+const SHADE_STATES = ['spawning', 'wander', 'chase', 'recoil', 'stunned'];
+const DRIFTER_STATES = ['idle', 'chase', 'flee', 'removed'];
 
 export function parseInputs(raw) {
   if (!isObj(raw) || !Array.isArray(raw.frames)) fail('inputs: expected {"frames": [...]}');
@@ -54,7 +56,7 @@ export function parseInputs(raw) {
 // Returns a function inputAt(k) that must be called with k = 0, 1, 2, ... in order.
 // Each frame only changes the fields it contains; others persist.
 export function inputCursor(frames) {
-  const cur = { move: [0, 0], cam_yaw_deg: 0, jump: false, interact: false, pulse: false, dash: false };
+  const cur = { move: [0, 0], cam_yaw_deg: 0, jump: false, interact: false, pulse: false, dash: false, pause: false };
   let i = 0;
   return (k) => {
     while (i < frames.length && frames[i].tick <= k) {
@@ -65,7 +67,7 @@ export function inputCursor(frames) {
   };
 }
 
-export function parseScenario(raw, tuning) {
+export function parseScenario(raw, tuning, lanternCount = tuning.lantern_count_night1) {
   if (!isObj(raw)) fail('scenario: expected JSON object');
   const sc = {};
   if (raw.player !== undefined) {
@@ -80,8 +82,14 @@ export function parseScenario(raw, tuning) {
       if (!isNonNegInt(raw.player.flames)) fail('scenario.player.flames: expected non-negative integer');
       sc.player.flames = raw.player.flames;
     }
+    for (const k of ['invuln_ticks', 'dash_cd_ticks', 'pulse_cd_ticks', 'charm_ticks']) {
+      if (raw.player[k] !== undefined) {
+        if (!isNonNegInt(raw.player[k])) fail(`scenario.player.${k}: expected non-negative integer`);
+        sc.player[k] = raw.player[k];
+      }
+    }
   }
-  for (const k of ['random_motes', 'random_shades']) {
+  for (const k of ['random_motes', 'random_shades', 'random_drifters', 'wind_enabled']) {
     if (raw[k] !== undefined) {
       if (typeof raw[k] !== 'boolean') fail(`scenario.${k}: expected boolean`);
       sc[k] = raw[k];
@@ -93,7 +101,9 @@ export function parseScenario(raw, tuning) {
       const where = `scenario.motes[${i}]`;
       if (isObj(m) && m.pos !== undefined) {
         if (m.id !== undefined && typeof m.id !== 'string') fail(`${where}.id: expected string`);
-        return { id: m.id, pos: parseVec(m.pos, where + '.pos') };
+        if (m.kind !== undefined && m.kind !== 'random' && m.kind !== 'dropped') fail(`${where}.kind: expected random|dropped`);
+        if (m.ttl_s !== undefined && (!isNum(m.ttl_s) || m.ttl_s <= 0)) fail(`${where}.ttl_s: expected positive number`);
+        return { id: m.id, pos: parseVec(m.pos, where + '.pos'), kind: m.kind, ttl_ticks: m.ttl_s !== undefined ? Math.round(m.ttl_s * 60) : undefined };
       }
       return { pos: parseVec(m, where) };
     });
@@ -109,7 +119,56 @@ export function parseScenario(raw, tuning) {
         if (seen.has(s.id)) fail(`${where}.id: duplicate id ${s.id}`);
         seen.add(s.id);
       }
-      return { id: s.id, pos: parseVec(s.pos, where + '.pos') };
+      const out = { id: s.id, pos: parseVec(s.pos, where + '.pos') };
+      if (s.state !== undefined) {
+        if (!SHADE_STATES.includes(s.state)) fail(`${where}.state: expected one of ${SHADE_STATES.join(', ')}`);
+        out.state = s.state;
+      }
+      if (s.state_ticks_left !== undefined) {
+        if (!isNonNegInt(s.state_ticks_left)) fail(`${where}.state_ticks_left: expected non-negative integer`);
+        out.state_ticks_left = s.state_ticks_left;
+      }
+      return out;
+    });
+  }
+  if (raw.drifters !== undefined) {
+    if (!Array.isArray(raw.drifters)) fail('scenario.drifters: expected array');
+    sc.drifters = raw.drifters.map((d, i) => {
+      const where = `scenario.drifters[${i}]`;
+      if (!isObj(d)) fail(`${where}: expected object with pos`);
+      if (d.id !== undefined && (typeof d.id !== 'string' || !d.id)) fail(`${where}.id: expected string`);
+      const out = { id: d.id, pos: parseVec(d.pos, where + '.pos') };
+      if (d.state !== undefined) {
+        if (!DRIFTER_STATES.includes(d.state)) fail(`${where}.state: expected one of ${DRIFTER_STATES.join(', ')}`);
+        out.state = d.state;
+      }
+      if (d.stolen !== undefined) {
+        if (!isNonNegInt(d.stolen)) fail(`${where}.stolen: expected non-negative integer`);
+        out.stolen = d.stolen;
+      }
+      if (d.state_ticks_left !== undefined) {
+        if (!isNonNegInt(d.state_ticks_left)) fail(`${where}.state_ticks_left: expected non-negative integer`);
+        out.state_ticks_left = d.state_ticks_left;
+      }
+      return out;
+    });
+  }
+  if (raw.charms !== undefined) {
+    if (!Array.isArray(raw.charms)) fail('scenario.charms: expected array');
+    sc.charms = raw.charms.map((c, i) => {
+      const where = `scenario.charms[${i}]`;
+      if (!isObj(c) || typeof c.id !== 'string' || !c.id) fail(`${where}: expected object with string id`);
+      const out = { id: c.id };
+      if (c.pos !== undefined) out.pos = parseVec(c.pos, where + '.pos');
+      if (c.available !== undefined) {
+        if (typeof c.available !== 'boolean') fail(`${where}.available: expected boolean`);
+        out.available = c.available;
+      }
+      if (c.respawn_ticks !== undefined) {
+        if (!isNonNegInt(c.respawn_ticks)) fail(`${where}.respawn_ticks: expected non-negative integer`);
+        out.respawn_ticks = c.respawn_ticks;
+      }
+      return out;
     });
   }
   if (raw.lanterns !== undefined) {
@@ -117,7 +176,7 @@ export function parseScenario(raw, tuning) {
     if (Array.isArray(raw.lanterns)) list = raw.lanterns;
     else if (isObj(raw.lanterns)) list = Object.entries(raw.lanterns).map(([id, v]) => ({ ...(isObj(v) ? v : {}), id }));
     else fail('scenario.lanterns: expected array or object keyed by id');
-    const n = tuning.lantern_count_night1;
+    const n = lanternCount;
     sc.lanterns = list.map((l, i) => {
       const where = `scenario.lanterns[${i}]`;
       if (!isObj(l)) fail(`${where}: expected object`);

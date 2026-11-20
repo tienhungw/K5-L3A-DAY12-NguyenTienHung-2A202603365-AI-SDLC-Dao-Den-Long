@@ -5,6 +5,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { InputError, parseInputs, parseScenario } from './sim/files.js';
 import { loadTuning, runHeadless } from './sim/runner.js';
+import { MAPS } from './sim/maps.js';
 
 function parseArgs(argv) {
   const known = new Set(['--seed', '--night', '--scenario', '--inputs', '--ticks', '--out', '--snapshot-every']);
@@ -36,7 +37,7 @@ function parseArgs(argv) {
     out: a.out,
   };
   if (!opts.out) throw new InputError('--out is required');
-  if (opts.night !== 1) throw new InputError(`--night ${opts.night} is not available (only night 1)`);
+  if (![1, 2, 3].includes(opts.night)) throw new InputError(`--night must be 1, 2 or 3 (got ${opts.night})`);
   return opts;
 }
 
@@ -50,9 +51,9 @@ function main() {
   try {
     const opts = parseArgs(process.argv.slice(2));
     const tuning = loadTuning();
-    const scenario = opts.scenario ? parseScenario(readJson(opts.scenario, 'scenario'), tuning) : null;
+    const scenario = opts.scenario ? parseScenario(readJson(opts.scenario, 'scenario'), tuning, MAPS[opts.night].lanterns.length) : null;
     const frames = opts.inputs ? parseInputs(readJson(opts.inputs, 'inputs')) : [];
-    const lines = runHeadless({ tuning, seed: opts.seed, scenario, frames, ticks: opts.ticks, every: opts.every });
+    const lines = runHeadless({ tuning, seed: opts.seed, scenario, frames, ticks: opts.ticks, every: opts.every, night: opts.night });
     writeFileSync(opts.out, lines.map((l) => JSON.stringify(l)).join('\n') + '\n');
     process.exitCode = 0;
   } catch (e) {
