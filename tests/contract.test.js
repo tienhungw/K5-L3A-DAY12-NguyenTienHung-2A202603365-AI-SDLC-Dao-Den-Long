@@ -18,9 +18,10 @@ const file = (name, content) => {
 };
 
 // Phase 2: contract v1.1 standard numbers. Phase 3: v1.2 — durations 240/270/300, fuel keys, new score table (Ticket-03 §5, §7).
-test('game.contract.json is v1.2 with Ticket-02/03 standard numbers', () => {
+// Phase 4: contract v1.3 only adds bench_cmd/soak_cmd (Ticket-04 §6); the tuning numbers stay exactly as v1.2.
+test('game.contract.json is v1.3 with Ticket-02/03 standard numbers', () => {
   for (const k of ['contract_version', 'team', 'build_cmd', 'run_cmd', 'headless_cmd', 'tuning']) assert.ok(k in contract, k);
-  assert.equal(contract.contract_version, '1.2');
+  assert.equal(contract.contract_version, '1.3');
   assert.deepEqual(contract.tuning, {
     player_speed: 6.0, carry_capacity: 10, lantern_cost: 10, lantern_count_night1: 5, pickup_radius: 1.0, interact_radius: 2.0,
     pulse_cost: 3, pulse_radius: 5.0, night1_duration_s: 240, night2_duration_s: 270, night3_duration_s: 300, flames: 3,
