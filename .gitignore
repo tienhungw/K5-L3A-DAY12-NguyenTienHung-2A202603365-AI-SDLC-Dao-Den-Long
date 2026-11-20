@@ -4,3 +4,8 @@ node_modules/
 *.log
 out*.jsonl
 .DS_Store
+data/
+dist/
+bench.json
+soak.json
+leaderboard-export.json

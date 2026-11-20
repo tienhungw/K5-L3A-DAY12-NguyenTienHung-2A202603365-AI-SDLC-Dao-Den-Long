@@ -115,6 +115,7 @@ export function createWorld(tuning, seed = 0, scenario = null, night = 1) {
     windEnabled: sc.wind_enabled ?? map.wind,
     wind: { active: false, dirDeg: null, ticks: 0, x: 0, z: 0 },
     prevButtons: Object.fromEntries(BUTTONS.map((b) => [b, false])),
+    bench: false, // Ticket-04 benchmark scene (set by the renderer only; never by headless/scenarios)
     fx: { lastPulseTick: -1000, lastHitTick: -1000, lastDashTick: -1000, lastJumpTick: -1000 },
   };
   const p = w.player;
@@ -324,7 +325,7 @@ export function step(w, input) {
   }
   // 2b. Fuel (Ticket-03): lit lanterns lose 1/60 per tick, plus 5/60 per draining shade; fuel <= 0 -> out.
   for (const l of w.lanterns) {
-    if (!l.lit) continue;
+    if (!l.lit || w.bench) continue; // Ticket-04 bench scene: no fuel burn
     l.fuelU -= Math.round(T.fuel_decay_per_s);
     for (const s of w.shades) {
       if (s.state !== 'drain' || s.target !== l.id) continue;
@@ -343,8 +344,8 @@ export function step(w, input) {
   // 3. Move Mây (jump, dash, jump pads, wind), then check falling off the island.
   if (active) movePlayer(w, input, press, emit);
 
-  // 4. Pick up motes and charms.
-  if (active) {
+  // 4. Pick up motes and charms (disabled in the Ticket-04 bench scene).
+  if (active && !w.bench) {
     const keep = [];
     for (const m of w.motes) {
       if (p.carried < capacity(w) && distXZ(p.pos, m.pos) <= T.pickup_radius + EPS && Math.abs(p.pos.y - m.pos.y) <= SPEC.pickup_dy + EPS) {
@@ -438,7 +439,7 @@ export function step(w, input) {
   }
 
   // 8. Move shades and drifters.
-  const targetable = active;
+  const targetable = active && !w.bench; // bench: Mây is ignored, shades keep wandering
   const speed = w.night === 3 ? map.shadeSpeed : T.shade_speed; // Night 3: 4.5 m/s
   for (const s of w.shades) {
     if (s.evict) continue;
@@ -538,8 +539,8 @@ export function step(w, input) {
     if (typeof g === 'number') dr.pos.y = g + SPEC.drifter_hover;
   }
 
-  // 9. Contact: drifters steal first, then shades hit (ascending id).
-  if (active) {
+  // 9. Contact: drifters steal first, then shades hit (ascending id). No damage in the bench scene.
+  if (active && !w.bench) {
     for (const dr of [...w.drifters].sort((a, b) => idNum(a.id) - idNum(b.id))) {
       if (dr.state !== 'chase' || p.carried <= 0) continue;
       if (distXZ(dr.pos, p.pos) <= SPEC.drifter_contact + EPS) {
@@ -603,7 +604,8 @@ export function step(w, input) {
   }
 
   // 11. Win / lose (Ticket-03): no early win; at dawn Mây must be alive with >= ceil(0.6 n) lanterns lit.
-  if (p.flames <= 0) endGame(w, 'lost', 'no_flames', emit);
+  if (w.bench) { /* Ticket-04 bench scene: the night never ends */ }
+  else if (p.flames <= 0) endGame(w, 'lost', 'no_flames', emit);
   else if (w.timeStart - st / TICK_RATE <= EPS) {
     const lit = w.lanterns.filter((l) => l.lit).length;
     const need = Math.ceil(T.win_ratio * w.lanterns.length - 1e-9);
