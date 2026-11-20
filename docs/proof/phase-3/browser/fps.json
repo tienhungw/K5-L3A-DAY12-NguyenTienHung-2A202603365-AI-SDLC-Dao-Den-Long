@@ -1,0 +1,32 @@
+[
+  {
+    "mode": "headless",
+    "resolution": "1280x720",
+    "seconds": 19,
+    "avg_fps": 42.7,
+    "min_fps": 39,
+    "samples": [
+      39,
+      39,
+      40,
+      42,
+      40,
+      43,
+      43,
+      45,
+      44,
+      39,
+      46,
+      45,
+      45,
+      42,
+      43,
+      44,
+      45,
+      44,
+      44
+    ],
+    "gpu": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "machine": "win32 10.0.26200 · 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz x8"
+  }
+]
