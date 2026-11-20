@@ -19,7 +19,7 @@ export function parseVec(v, where) {
 }
 
 const BUTTONS = ['jump', 'interact', 'pulse', 'dash', 'pause'];
-const SHADE_STATES = ['spawning', 'wander', 'chase', 'recoil', 'stunned'];
+const SHADE_STATES = ['spawning', 'wander', 'chase', 'recoil', 'stunned', 'drain'];
 const DRIFTER_STATES = ['idle', 'chase', 'flee', 'removed'];
 
 export function parseInputs(raw) {
@@ -82,7 +82,7 @@ export function parseScenario(raw, tuning, lanternCount = tuning.lantern_count_n
       if (!isNonNegInt(raw.player.flames)) fail('scenario.player.flames: expected non-negative integer');
       sc.player.flames = raw.player.flames;
     }
-    for (const k of ['invuln_ticks', 'dash_cd_ticks', 'pulse_cd_ticks', 'charm_ticks']) {
+    for (const k of ['invuln_ticks', 'dash_cd_ticks', 'pulse_cd_ticks', 'charm_ticks', 'successful_lights']) {
       if (raw.player[k] !== undefined) {
         if (!isNonNegInt(raw.player[k])) fail(`scenario.player.${k}: expected non-negative integer`);
         sc.player[k] = raw.player[k];
@@ -127,6 +127,10 @@ export function parseScenario(raw, tuning, lanternCount = tuning.lantern_count_n
       if (s.state_ticks_left !== undefined) {
         if (!isNonNegInt(s.state_ticks_left)) fail(`${where}.state_ticks_left: expected non-negative integer`);
         out.state_ticks_left = s.state_ticks_left;
+      }
+      if (s.target_lantern_id !== undefined) {
+        if (typeof s.target_lantern_id !== 'string' || !/^L\d+$/.test(s.target_lantern_id) || Number(s.target_lantern_id.slice(1)) > lanternCount) fail(`${where}.target_lantern_id: expected L1..L${lanternCount}`);
+        out.target_lantern_id = s.target_lantern_id;
       }
       return out;
     });
@@ -187,6 +191,14 @@ export function parseScenario(raw, tuning, lanternCount = tuning.lantern_count_n
       if (l.lit !== undefined) {
         if (typeof l.lit !== 'boolean') fail(`${where}.lit: expected boolean`);
         out.lit = l.lit;
+      }
+      if (l.fuel !== undefined) {
+        if (!isNum(l.fuel) || l.fuel < 0 || l.fuel > tuning.fuel_max) fail(`${where}.fuel: expected number 0..${tuning.fuel_max}`);
+        out.fuel = l.fuel;
+      }
+      if (l.ever_lit !== undefined) {
+        if (typeof l.ever_lit !== 'boolean') fail(`${where}.ever_lit: expected boolean`);
+        out.ever_lit = l.ever_lit;
       }
       if (l.deposited !== undefined) {
         if (!isNonNegInt(l.deposited)) fail(`${where}.deposited: expected non-negative integer`);
