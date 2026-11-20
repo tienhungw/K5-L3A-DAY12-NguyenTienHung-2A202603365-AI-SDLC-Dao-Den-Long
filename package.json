@@ -1,0 +1,19 @@
+{
+  "name": "dao-den-long",
+  "version": "0.1.0",
+  "description": "Đảo Đèn Lồng — 3D third-person lantern-keeper game (Day 12 AI SDLC lab)",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "headless": "node src/headless.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "three": "0.160.0"
+  }
+}
