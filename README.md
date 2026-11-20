@@ -3,7 +3,7 @@
 > **Video demo:** sẽ được đính kèm Release `v1.0.0` ở Phase 4 (chưa có ở tag này).
 > Nguyễn Tiến Hưng · 2A202603365 · Day 12 AI SDLC · Tài liệu gốc của lab: [docs/lab/](docs/lab/README.md)
 
-Game 3D góc nhìn thứ ba. Bạn là **Mây**, người giữ đèn nhỏ tuổi với chiếc nón lá treo đèn lồng. Sương đen đã nuốt ánh sáng của Đảo Bến: hãy gom **đom đóm**, thắp lại **5 Đèn Lồng Lớn** trước bình minh và né **Bóng Mực**.
+Game 3D góc nhìn thứ ba. Bạn là **Mây**, người giữ đèn nhỏ tuổi đội nón lá, áo trắng ngà, khăn đỏ. Sương đen đã nuốt ánh sáng của ba hòn đảo: gom **đom đóm**, thắp lại các **Đèn Lồng Lớn** trước bình minh, né **Bóng Mực** và giữ đom đóm khỏi tay **Gió Lạc**.
 
 ## Cài đặt và chạy (3 lệnh, macOS / Linux / Windows, cần Node ≥ 18)
 ```bash
@@ -16,69 +16,83 @@ npm start          # mở http://localhost:8765  (cổng bận? PORT=8766 npm st
 | Phím | Hành động |
 |---|---|
 | W A S D (hoặc ↑ ↓) | Di chuyển (theo hướng camera) |
-| Kéo chuột / ← → | Xoay camera |
+| Kéo chuột / ← → | Xoay camera (độ nhạy chỉnh trong Cài đặt) |
 | Space | Nhảy |
-| E | Nộp đom đóm vào Đèn Lồng Lớn gần nhất (trong 2 m) |
-| F (hoặc Q) | Xung sáng (tốn 1 đom đóm): làm choáng + đẩy Bóng Mực trong 4 m |
-| R | Chơi lại · M: tắt tiếng · P: tạm dừng |
+| Shift | Lướt (14 m/s trong 0.2 s, hồi chiêu 1.5 s) |
+| E | Nạp ánh sáng vào Đèn Lồng Lớn gần nhất (trong 2 m) |
+| F | Tỏa Sáng (tốn 3 đom đóm): choáng + đẩy lùi Bóng Mực trong 5 m, đuổi Gió Lạc |
+| Esc / P | Tạm dừng: Tiếp tục · Chơi lại Đêm · Cài đặt · Về menu |
 
-Thêm `?autoplay` vào URL để xem bot tự chơi (`?autoplay&seed=5&skip=40` để tua nhanh 40 s).
+URL tiện ích: `?autoplay&seed=4&night=1` (bot tự chơi), `&skip=40` (tua nhanh 40 s), `?fps` (hiện FPS).
 
-## Luật và cách tính điểm (Đêm 1 – Đảo Bến)
-- Đom đóm tự được nhặt khi đến gần (≤ 1 m), mang tối đa **5**. Mỗi Đèn Lồng Lớn cần **5** đom đóm.
-- Bóng Mực luôn đuổi theo (2.5 m/s, bạn chạy 4.5 m/s). Chạm vào: mất 1 **lửa** (có 3), rơi mất một nửa số đom đóm đang mang, bất tử 1.5 s.
-- Bóng Mực **sợ đèn**: không thể vào vòng 3 m quanh đèn đã thắp — đứng cạnh đèn sáng là an toàn.
-- **Thắng**: thắp đủ 5 đèn. **Thua**: hết lửa, hoặc hết đêm (240 s).
+## Ba Đêm
+| Đêm | Đảo | Đèn | Thời gian | Điểm mới |
+|---|---|---|---|---|
+| 1 | Đảo Bến — đảo tròn bán kính 40 m | 5 | 5:00 | — |
+| 2 | Đảo Cau — hai đảo nối bằng cầu tre, bục nhảy vượt biển mây | 6 | 5:30 | Gió Lạc, Bùa Gió |
+| 3 | Đảo Chuông — 3 tầng, dốc, bục nhảy, tháp chuông | 7 | 6:00 | Gió mạnh mỗi 30 s, Bóng Mực nhanh hơn |
+
+Menu → giới thiệu Đêm (lời Ông Đăng) → chơi → kết quả → Đêm kế. Thắng Đêm 3 thì tới màn **Bình Minh** với tổng điểm; thua thì chơi lại Đêm đó.
+
+## Luật (số chuẩn Ticket-02)
+- Chạy 6 m/s, nhảy 7 m/s. Rơi khỏi đảo (xuống biển mây): −1 lửa, mất hết đom đóm, hồi sinh sau 1 s.
+- Đom đóm tự nhặt khi tới gần (≤ 1 m), mang tối đa **10**. Mỗi Đèn Lồng Lớn cần **10**, nạp nhiều lần được.
+- Bóng Mực phát hiện trong 12 m, bỏ đuổi ngoài 18 m, chạy 4 m/s (Đêm 3: 4.5). Chạm vào: −1 **Ngọn Lửa** (có 3), rơi một nửa số đom đóm ra quanh Mây (nhặt lại được trong 8 s), bất tử 1.5 s.
+- Đèn đã sáng tạo vùng an toàn **6 m** mà Bóng Mực không vào được.
+- Gió Lạc lao tới khi bạn mang ≥ 5 đom đóm, cướp tối đa 3 rồi bay đi. Tỏa Sáng trúng nó thì nó đánh rơi đồ đã cướp.
+- Bùa Gió (lá bùa đỏ viền vàng): 10 s chạy 7.2 m/s và lướt không cần hồi chiêu.
+- **Thắng**: thắp hết đèn. **Thua**: hết Ngọn Lửa hoặc hết giờ.
 
 | Sự kiện | Điểm |
 |---|---|
-| Nhặt 1 đom đóm | +10 |
+| Mỗi đom đóm **nạp** vào đèn | +10 |
 | Thắp 1 đèn | +100 |
-| Làm choáng 1 Bóng Mực bằng xung | +20 |
+| Mỗi Bóng Mực trúng Tỏa Sáng | +5 |
 | Khi thắng: mỗi giây còn lại (làm tròn xuống) | +2 |
-| Khi thắng: mỗi lửa còn lại | +50 |
+| Khi thắng: mỗi Ngọn Lửa còn lại | +50 |
 
-## Chế độ headless (Test Contract v1.0)
+Tổng điểm game = tổng điểm các Đêm đã thắng.
+
+## Chế độ headless (Test Contract v1.1)
 ```bash
-node src/headless.js --seed 1 --night 1 --ticks 4800 --out out.jsonl \
+node src/headless.js --seed 1 --night 1 --ticks 21600 --out out.jsonl \
   [--scenario scenario.json] [--inputs inputs.json] [--snapshot-every 10]
 ```
-- Không cần `npm install`, không cần cửa sổ/GPU. Lỗi file inputs/scenario → exit code 2.
-- Khai báo: [game.contract.json](game.contract.json). Game **đọc trực tiếp** khối `tuning` từ file này, nên con số khai báo chính là con số game dùng.
-- Khái niệm không có trong game: `fall_enabled: false` — người chơi bị chặn ở mép đảo (bán kính 30 m), không có sát thương do rơi. Không dùng nút `dash`.
-- Các giả định cho chỗ PRD mơ hồ: [docs/notes/phase-1.md](docs/notes/phase-1.md).
+- `--night` nhận 1, 2, 3. Không cần `npm install`, không cần cửa sổ/GPU. Lỗi file hoặc `--night` sai → exit code 2. Một Đêm đầy đủ chạy dưới 1 s.
+- Khai báo: [game.contract.json](game.contract.json). Game **đọc trực tiếp** khối `tuning` từ file này; các số chuẩn còn lại nằm ở `SPEC` trong [src/sim/world.js](src/sim/world.js). Bản đồ: [src/sim/maps.js](src/sim/maps.js).
+- Giả định cho chỗ ticket chưa nói rõ: [Phase 1](docs/notes/phase-1.md) · [Phase 2](docs/notes/phase-2.md). Ví dụ: điểm xuất phát Đêm 3 là (0,0,−30) vì (0,0,0) nằm trong tháp chuông.
 
 ## Kiểm thử và bằng chứng
 ```bash
-npm test                          # unit + contract + mọi scenario headless (chạy 2 lần, so tất định)
-node scripts/proof.mjs phase-1    # sinh lại bằng chứng vào docs/proof/phase-1/
+npm test                                        # 60 test + 20 scenario headless (mỗi scenario chạy 2 lần để so tất định)
+node scripts/proof.mjs phase-2                  # sinh lại bằng chứng vào docs/proof/phase-2/
+node scripts/browser-check.mjs out/ --fps-seconds 20   # (Node ≥ 22 + Chrome, khi npm start đang chạy) ảnh + lỗi console + FPS
 ```
-- Bằng chứng từng phase: [docs/proof/](docs/proof/phase-1/README.md) · CI: GitHub Actions chạy `npm test` trên Ubuntu + macOS, Node 18 & 22 mỗi lần push.
+Bằng chứng: [Phase 1](docs/proof/phase-1/README.md) · [Phase 2](docs/proof/phase-2/README.md). CI trên GitHub Actions chạy `npm test` trên Ubuntu + macOS với Node 18 và 22.
 
 ## Sáng tạo của tôi
-Tất cả nằm trong `src/web/` (chỉ phần hiển thị) — không đụng vào luật trong `src/sim/`, nên đầu ra headless không đổi (bằng chứng: toàn bộ test headless chạy không cần trình duyệt và vẫn PASS).
-- **Đom đóm bay quanh Mây**: số đom đóm đang mang hiện thành những đốm sáng xoay quanh người; đèn nhỏ trên nón sáng hơn khi mang nhiều.
-- **Hạt tiến độ trên đèn**: mỗi Đèn Lồng Lớn có 5 hạt sáng dần theo số đom đóm đã nộp; khi thắp, đèn bùng sáng và hiện vòng an toàn màu cam trên đất.
-- **Âm thanh tổng hợp** (WebAudio, không dùng file): tiếng "ting" cao dần khi nhặt, hợp âm khi thắp đèn, tiếng trầm khi bị đánh, giai điệu thắng/thua.
-- **Gợi ý theo ngữ cảnh**: "Nhấn E để nộp…", "Túi đầy!", "Bóng Mực tới gần — nhấn F!".
-- **Chế độ tự chơi `?autoplay`**: bot dùng đúng input của contract (kể cả xoay camera và đổi hệ trục), dùng để chụp ảnh bằng chứng và quay demo.
+Tất cả nằm trong `src/web/`, chỉ là phần hiển thị và âm thanh, không đụng tới luật trong `src/sim/`. Vì vậy đầu ra headless không đổi: toàn bộ test headless chạy không cần trình duyệt và vẫn PASS.
+- **Âm thanh riêng:** nhạc nền đêm `lab11nen.mp3`, tiếng Tỏa Sáng `lab11duoi.mp3`, tiếng nạp ánh sáng `lab11sang.mp3`. Các hiệu ứng khác (nhặt, nhảy, lướt, Bóng Mực xuất hiện, đếm ngược, thắng/thua) được tổng hợp bằng WebAudio.
+- **Vòng tiến độ trên đèn:** vòng sáng quanh đèn lớn dần theo số đom đóm đã nạp; khi thắp, đèn bùng sáng và hiện vòng an toàn 6 m trên mặt đất.
+- **Gió Lạc là dải lụa:** các mảnh lụa bay theo vệt đường đi; sáng lên khi đang đuổi hoặc đang mang đồ cướp.
+- **Lá bay báo gió** 2 s trước mỗi cơn gió ở Đêm 3, kèm tiếng gió và thông báo.
+- **Lời Ông Đăng** cho từng Đêm và thông báo ngắn theo tình huống (đèn sáng, bị cướp, nhặt bùa, rơi xuống biển mây).
+- **Bot `?autoplay`:** dùng đúng input của contract, biết đi qua cầu, lên dốc, dùng bục nhảy và né Bóng Mực. Dùng để chụp ảnh bằng chứng và đo FPS.
 
 ## Cấu trúc
 ```
-game.contract.json     khai báo contract + tuning (nguồn số duy nhất)
-src/sim/               logic game thuần (world.js, files.js, runner.js, rng.js)
+game.contract.json     contract v1.1 + tuning
+src/sim/               logic game thuần: world.js (luật, 12 bước/tick), maps.js (3 bản đồ), files.js, runner.js, rng.js
 src/headless.js        CLI headless
-src/web/               renderer Three.js, audio, autopilot
+src/web/               renderer Three.js, menu/HUD, audio.js + sounds/, autopilot.js
 server.js              server tĩnh không phụ thuộc
 tests/                 node:test + tests/scenarios/*.json
-scripts/               proof.mjs, gen-win-scenario.mjs, stop-hook.mjs
-docs/specs/            tóm tắt yêu cầu từng phase
-docs/notes/            giả định, nhật ký AI, retro
-docs/proof/            bằng chứng từng phase
+scripts/               proof.mjs, browser-check.mjs, gen-win-scenario.mjs, stop-hook.mjs
+docs/specs/            yêu cầu từng phase · docs/notes/ giả định, nhật ký AI, retro · docs/proof/ bằng chứng
 AGENTS.md, CLAUDE.md, .claude/   harness AI (skill verify, Stop hook)
 ```
 
 ## Harness AI
-[AGENTS.md](AGENTS.md) (lệnh, cấu trúc, quy tắc) · skill [verify](.claude/skills/verify/SKILL.md) (chạy kiểm chứng + lưu bằng chứng) · Stop hook [.claude/settings.json](.claude/settings.json) → [scripts/stop-hook.mjs](scripts/stop-hook.mjs) (không cho agent kết thúc khi test đỏ) · CI [.github/workflows/ci.yml](.github/workflows/ci.yml). Nhật ký: [docs/notes/ai-log.md](docs/notes/ai-log.md).
+[AGENTS.md](AGENTS.md) (lệnh, cấu trúc, quy tắc; cập nhật mỗi phase) · skill [verify](.claude/skills/verify/SKILL.md) · Stop hook [.claude/settings.json](.claude/settings.json) → [scripts/stop-hook.mjs](scripts/stop-hook.mjs) (không cho agent kết thúc khi test đỏ) · CI [.github/workflows/ci.yml](.github/workflows/ci.yml). Nhật ký: [docs/notes/ai-log.md](docs/notes/ai-log.md).
 
 Giấy phép: [MIT](LICENSE) · Nguồn: [CREDITS.md](CREDITS.md) · Thay đổi: [CHANGELOG.md](CHANGELOG.md)
