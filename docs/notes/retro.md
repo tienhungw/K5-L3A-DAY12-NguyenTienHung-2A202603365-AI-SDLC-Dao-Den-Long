@@ -13,3 +13,8 @@
 - **Chưa hiệu quả:** phase này rất lớn; renderer, bot và docs chiếm nhiều thời gian hơn luật. Một số tính năng UI (Bình Minh, lưu cài đặt, âm thanh) chỉ kiểm tra tay.
 - **Harness hữu ích nhất:** `proof.mjs` (thêm `night`, `last_snapshot`) và `browser-check.mjs` (ảnh + lỗi console + FPS trong một lệnh).
 - **Nếu làm lại:** viết test Playwright-kiểu (qua CDP) cho chuỗi menu → Đêm → kết quả sớm hơn để tự động hóa phần UI.
+
+## Sau Phase 3
+- **Hiệu quả:** viết ADR trước khi code giúp bước sửa code chỉ còn là "chép" mô hình đã chốt. Lưu dầu dạng số nguyên 1/60 làm mọi kỳ vọng tính tay khớp chính xác tới tick.
+- **Chưa hiệu quả:** 3 kỳ vọng test sai vì quên tương tác giữa các bước trong cùng một tick (bước 2 hút dầu trước bước 5 châm dầu). Bài học: với mỗi test liên quan nhiều cơ chế, viết phép tính theo từng bước của tick ngay trong chú thích.
+- **Harness hữu ích nhất:** bảng "test cũ bị thay" trong ghi chú phase + quy tắc "không bao giờ skip" trong AGENTS.md.

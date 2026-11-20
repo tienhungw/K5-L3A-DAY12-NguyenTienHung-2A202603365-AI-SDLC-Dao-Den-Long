@@ -72,3 +72,32 @@ Stop hook [scripts/stop-hook.mjs](../../scripts/stop-hook.mjs) (chặn agent k�
 - Đọc ticket (người dùng dán) + spec: ~15k input. Viết sim + test + renderer + docs: ~70k output.
 - Ngữ cảnh tích lũy cả phiên Phase 2 (gửi lại mỗi lượt, phần lớn cache): ước tính **~4–6 triệu token input**, **~80k output**. Số chính xác: `/cost`.
 - Cách tiết kiệm: sửa bằng script Python nhỏ thay vì đọc lại cả file lớn; một lần đo FPS có kiểm soát thay vì thử mò; dùng lại proof script/CI của Phase 1.
+
+## Phase 3
+
+### Lời nhắc chính
+1. Người dùng dán nguyên văn Ticket-03 → lưu `docs/specs/phase-3-ticket-03.md`, viết **ADR trước khi code** để chốt mô hình trạng thái đèn và luật thắng.
+
+### Trình tự
+| Bước | Việc | Kết quả |
+|---|---|---|
+| 1 | Spec + ADR 0001 | máy trạng thái đèn, `drain`, bước 2b, luật bình minh |
+| 2 | Sửa `world.js` / `files.js` / contract v1.2 bằng một script sửa có kiểm tra (assert từng đoạn) | 3 Đêm chạy được |
+| 3 | Chạy test cũ → 11 test đỏ, đúng các luật bị [THAY THẾ] | sửa/xóa có lý do (bảng §4 phase-3.md) |
+| 4 | 17 test mới, kỳ vọng tính tay theo đơn vị 1/60 | 3 kỳ vọng sai (xem dưới) |
+| 5 | 8 scenario p3 + cập nhật p1-02, p1-03, p2-06 | 28/28 |
+| 6 | Renderer + bot châm dầu; ảnh 09–11; FPS 42.7 | |
+
+### Lỗi của AI (và cách phát hiện / sửa)
+| # | Lỗi | Phát hiện | Sửa |
+|---|---|---|---|
+| 1 | Hết choáng: lúc đầu vẫn phát hiện lại Mây ngay trong tick đó (snapshot ra `chase`), trái với chữ của ticket "hết choáng thì về wander" | đọc lại ticket khi viết test | tick hết choáng dừng ở `wander` (giả định C8) |
+| 2 | Kỳ vọng `refuel.fuel = 50` quên rằng bóng đang hút cũng lấy 5/60 ở bước 2 của chính tick đó | test đỏ → **tính lại tay**: 1200 − 1 − 5 + 1800 = 2994 → 49.9 | sửa test, ghi phép tính trong chú thích |
+| 3 | Kỳ vọng `fuel_drain` chỉ ở tick 180, 240: quên tick 300 cũng là bội của 60 | đọc output thật, đối chiếu ticket "mỗi 60 tick khi đang hút" | thêm `[300, 0]` |
+| 4 | Kỳ vọng `fuel 99.98` trong scenario — snapshot làm tròn **1** chữ số → 100 | tự rà trước khi chạy | sửa thành 100 |
+| 5 | Script sửa test cố xóa một đoạn đã bị thay ở bước trước → lỗi giữa chừng | traceback Python | tách phần còn lại ra chạy riêng; các phần đã ghi giữ nguyên |
+| 6 | Ảnh "dawn result" chọn nhầm seed (bot thua rồi tự chơi lại) | xem ảnh | đổi sang seed bot thắng; chụp trước khi bot tự bấm tiếp |
+
+### Token / chi phí (ước tính)
+- Ticket + ADR + sim + test + renderer + docs: ~45k token output; ngữ cảnh tích lũy Phase 3 ước tính ~3–4 triệu token input (phần lớn cache). Số chính xác: `/cost`.
+- Tiết kiệm: sửa file bằng script có `assert` (không đọc lại file lớn), dùng lại `proof.mjs` / `browser-check.mjs` của Phase 2, chỉ thêm 3 ảnh mới.
