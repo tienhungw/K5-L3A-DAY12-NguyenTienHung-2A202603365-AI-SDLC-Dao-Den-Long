@@ -1,0 +1,69 @@
+{
+ "requirement": "Tạm dừng: tick tăng nhưng sim_tick/thời gian đứng yên, state paused; resumed thì tiếp tục",
+ "seed": 1,
+ "ticks": 60,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "move": [
+     1,
+     0
+    ]
+   },
+   {
+    "tick": 10,
+    "pause": true
+   },
+   {
+    "tick": 11,
+    "pause": false
+   },
+   {
+    "tick": 40,
+    "pause": true
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "paused",
+    "tick": 11
+   },
+   {
+    "name": "resumed",
+    "tick": 41
+   }
+  ],
+  "player_pos_at": [
+   {
+    "tick": 40,
+    "pos": [
+     1,
+     0,
+     0
+    ]
+   },
+   {
+    "tick": 60,
+    "pos": [
+     3,
+     0,
+     0
+    ]
+   }
+  ],
+  "last_snapshot": {
+   "sim_tick": 30,
+   "state": "playing"
+  }
+ }
+}

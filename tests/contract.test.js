@@ -17,16 +17,17 @@ const file = (name, content) => {
   return p;
 };
 
-test('game.contract.json has every required field', () => {
+// Phase 2: contract bumped to v1.1 and tuning must equal Ticket-02 standard numbers (was: my own Phase 1 numbers).
+test('game.contract.json is v1.1 with Ticket-02 standard numbers', () => {
   for (const k of ['contract_version', 'team', 'build_cmd', 'run_cmd', 'headless_cmd', 'tuning']) assert.ok(k in contract, k);
-  assert.equal(contract.contract_version, '1.0');
-  const keys = ['player_speed', 'carry_capacity', 'lantern_cost', 'lantern_count_night1', 'pickup_radius', 'interact_radius',
-    'pulse_cost', 'pulse_radius', 'night1_duration_s', 'flames', 'invuln_s', 'hit_drop_ratio', 'pulse_stun_s', 'pulse_push_m',
-    'pulse_cooldown_s', 'safe_radius', 'shade_speed', 'shade_hit_radius', 'fall_enabled', 'score'];
-  for (const k of keys) assert.ok(k in contract.tuning, k);
-  for (const k of ['per_mote', 'per_lantern', 'per_stun', 'per_second_left', 'per_flame_left']) assert.ok(k in contract.tuning.score, k);
-  assert.equal(contract.tuning.lantern_count_night1, 5);
-  assert.equal(typeof contract.tuning.fall_enabled, 'boolean');
+  assert.equal(contract.contract_version, '1.1');
+  assert.deepEqual(contract.tuning, {
+    player_speed: 6.0, carry_capacity: 10, lantern_cost: 10, lantern_count_night1: 5, pickup_radius: 1.0, interact_radius: 2.0,
+    pulse_cost: 3, pulse_radius: 5.0, night1_duration_s: 300, night2_duration_s: 330, night3_duration_s: 360, flames: 3,
+    invuln_s: 1.5, hit_drop_ratio: 0.5, pulse_stun_s: 2.0, pulse_push_m: 4.0, pulse_cooldown_s: 3.0, safe_radius: 6.0,
+    shade_speed: 4.0, shade_hit_radius: 1.0, fall_enabled: true, dash_speed: 14.0, dash_duration_s: 0.2, dash_cooldown_s: 1.5,
+    score: { per_mote: 10, per_lantern: 100, per_stun: 5, per_second_left: 2, per_flame_left: 50 },
+  });
 });
 
 test('CLI writes JSONL: snapshot 0 first, end last, exit 0', () => {
@@ -37,20 +38,33 @@ test('CLI writes JSONL: snapshot 0 first, end last, exit 0', () => {
   assert.equal(lines[0].type, 'snapshot');
   assert.equal(lines[0].tick, 0);
   assert.deepEqual(lines[0].player.pos, [0, 0, 0]);
+  assert.deepEqual(lines[1], { type: 'event', tick: 0, name: 'night_start', data: { night: 1 } });
   assert.deepEqual(lines.at(-1), { type: 'end', ticks: 120, state: 'playing', score: lines.at(-1).score });
   const snaps = lines.filter((l) => l.type === 'snapshot');
   assert.deepEqual(snaps.map((s) => s.tick), [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120]);
 });
 
-test('snapshot has all contract fields', () => {
-  const s = run({ ticks: 1 }).snaps[0];
-  for (const k of ['type', 'tick', 'sim_tick', 'state', 'time_left_s', 'score', 'player', 'lanterns', 'shades', 'motes_active']) assert.ok(k in s, k);
-  assert.deepEqual(Object.keys(s.player).sort(), ['carried', 'flames', 'pos']);
-  assert.equal(s.lanterns.length, 5);
-  assert.deepEqual(s.lanterns.map((l) => l.id), ['L1', 'L2', 'L3', 'L4', 'L5']);
-  for (const l of s.lanterns) assert.deepEqual(Object.keys(l).sort(), ['deposited', 'id', 'lit', 'pos']);
-  for (const sh of s.shades) assert.deepEqual(Object.keys(sh).sort(), ['id', 'pos', 'state']);
-  assert.equal(s.motes_active, s.motes.length);
+// Phase 2: v1.1 snapshot fields added (night, wind, player.vel/grounded/invuln/cooldowns, motes kind/ttl, drifters, charms).
+test('snapshot has all v1.1 contract fields', () => {
+  for (const night of [1, 2, 3]) {
+    const s = run({ ticks: 1, night }).snaps[0];
+    for (const k of ['type', 'tick', 'sim_tick', 'state', 'night', 'time_left_s', 'score', 'wind', 'player', 'lanterns', 'shades', 'motes_active', 'motes', 'drifters', 'charms']) assert.ok(k in s, k);
+    assert.equal(s.night, night);
+    assert.deepEqual(Object.keys(s.wind).sort(), ['active', 'dir_deg']);
+    assert.deepEqual(Object.keys(s.player).sort(), ['carried', 'charm_s', 'dash_cd_s', 'flames', 'grounded', 'invuln', 'pos', 'pulse_cd_s', 'vel']);
+    assert.equal(s.lanterns.length, [0, 5, 6, 7][night]);
+    for (const l of s.lanterns) assert.deepEqual(Object.keys(l).sort(), ['deposited', 'id', 'lit', 'pos']);
+    for (const m of s.motes) { assert.deepEqual(Object.keys(m).sort(), ['id', 'kind', 'pos', 'ttl_s']); assert.equal(m.kind, 'random'); assert.equal(m.ttl_s, null); }
+    assert.equal(s.motes_active, 20);
+    assert.equal(s.time_left_s, [0, 300, 330, 360][night]);
+    for (const c of s.charms) for (const k of ['id', 'available', 'respawn_s']) assert.ok(k in c);
+    assert.deepEqual(s.charms.map((c) => c.id), [[], [], ['C1'], ['C1', 'C2']][night]);
+  }
+});
+
+test('--night accepts 1, 2, 3 and rejects others with exit 2', () => {
+  for (const n of ['1', '2', '3']) assert.equal(cli(['--seed', '1', '--night', n, '--ticks', '5', '--out', join(tmp, 'n.jsonl')]).status, 0);
+  for (const n of ['0', '4']) assert.equal(cli(['--seed', '1', '--night', n, '--ticks', '5', '--out', join(tmp, 'n.jsonl')]).status, 2);
 });
 
 test('--snapshot-every and time_left_s follow the tick model', () => {
@@ -87,6 +101,11 @@ test('malformed inputs / scenario -> exit code 2 with stderr message', () => {
     ['--scenario', file('bad7.json', { lanterns: [{ id: 'L9', lit: true }] })],
     ['--scenario', file('bad8.json', { shades: [{ pos: 'here' }] })],
     ['--scenario', file('bad9.json', '[1,2')],
+    ['--scenario', file('bad10.json', { shades: [{ pos: [1, 1, 1], state: 'angry' }] })],
+    ['--scenario', file('bad11.json', { drifters: [{ pos: [1, 1, 1], state: 'zoom' }] })],
+    ['--scenario', file('bad12.json', { charms: [{ available: true }] })],
+    ['--scenario', file('bad13.json', { player: { invuln_ticks: -1 } })],
+    ['--inputs', file('bad14.json', { frames: [{ tick: 0, pause: 1 }] })],
     ['--inputs', join(tmp, 'missing.json')],
   ];
   for (const extra of bad) {
@@ -101,9 +120,10 @@ test('missing --ticks / --out is an error (nonzero)', () => {
   assert.notEqual(cli(['--seed', '1', '--night', '1', '--ticks', '5']).status, 0);
 });
 
+// Phase 2: night_start {night} is now emitted at tick 0 (not a scenario-setup event); nothing else may appear.
 test('scenario setup emits no events and no score (lit lantern gives no points)', () => {
   const r = run({ scenario: quiet({ lanterns: [{ id: 'L2', lit: true }], motes: [[0, 0, 0]] }), ticks: 0 });
-  assert.equal(r.events.length, 0);
+  assert.deepEqual(r.events.map((e) => e.name), ['night_start']);
   assert.equal(r.snaps[0].score, 0);
   assert.equal(r.snaps[0].lanterns[1].lit, true);
   assert.equal(r.snaps[0].motes_active, 1);
@@ -116,6 +136,7 @@ test('generated ids are deterministic and continue after scenario ids', () => {
 
 test('game stops when it ends; end line carries final state', () => {
   const r = run({ scenario: quiet({ time_left_s: 0.5 }), ticks: 1000 });
+  assert.equal(r.last.tick, 30);
   assert.equal(r.end.ticks, 30);
   assert.equal(r.end.state, 'lost');
   assert.deepEqual(r.ev('game_over')[0].data, { result: 'lost', reason: 'dawn' });

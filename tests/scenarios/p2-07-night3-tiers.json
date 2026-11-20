@@ -1,0 +1,56 @@
+{
+ "requirement": "Đêm 3: đi lên dốc 30° từ r=32 lên tầng 1 (Y=3)",
+ "night": 3,
+ "seed": 1,
+ "ticks": 120,
+ "snapshot_every": 10,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    27.713,
+    0,
+    16
+   ]
+  }
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "move": [
+     -0.866025,
+     -0.5
+    ]
+   }
+  ]
+ },
+ "expect": {
+  "no_events": [
+   "player_hit"
+  ],
+  "player_pos_at": [
+   {
+    "tick": 80,
+    "pos": [
+     20.785,
+     3,
+     12
+    ],
+    "tol": 0.02
+   },
+   {
+    "tick": 120,
+    "pos": [
+     17.321,
+     3,
+     10
+    ],
+    "tol": 0.02
+   }
+  ]
+ }
+}

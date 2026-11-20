@@ -1,0 +1,59 @@
+{
+ "requirement": "Tỏa Sáng trúng Gió Lạc đang flee có đồ -> thả đom đóm rơi tại chỗ, biến mất sau 120 tick",
+ "night": 2,
+ "seed": 1,
+ "ticks": 130,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "carried": 3
+  },
+  "drifters": [
+   {
+    "pos": [
+     3,
+     1.5,
+     0
+    ],
+    "state": "flee",
+    "stolen": 3
+   }
+  ]
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "pulse": true
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "pulse",
+    "tick": 1,
+    "data": {
+     "drifter_ids": [
+      "D1"
+     ]
+    }
+   },
+   {
+    "name": "drifter_drop",
+    "tick": 1,
+    "data": {
+     "drifter_id": "D1",
+     "amount": 3
+    }
+   }
+  ],
+  "last_snapshot": {
+   "drifters.0.state": "removed"
+  }
+ }
+}

@@ -1,20 +1,117 @@
 {
-  "requirement": "PRD-0: nhặt đom đóm (pickup_radius), mang tối đa carry_capacity, nộp vào L1 trong interact_radius -> thắp đèn (+100)",
-  "seed": 1, "ticks": 300,
-  "scenario": { "random_motes": false, "random_shades": false,
-    "motes": [[0, 0, 2], [0, 0, 4], [0, 0, 6], [0.5, 0, 8], [-0.5, 0, 10], [0, 0, 12]] },
-  "inputs": { "frames": [
-    { "tick": 0, "move": [0, 1] },
-    { "tick": 230, "move": [0, 0] },
-    { "tick": 240, "interact": true }
-  ] },
-  "expect": {
-    "end_state": "playing", "end_score": 150,
-    "events": [
-      { "name": "mote_picked", "data": { "carried": 1 } },
-      { "name": "mote_picked", "data": { "carried": 5 } },
-      { "name": "deposit", "tick": 241, "data": { "lantern_id": "L1", "amount": 5, "deposited": 5 } },
-      { "name": "lantern_lit", "tick": 241, "data": { "lantern_id": "L1" } }
+ "requirement": "PRD-0 + Ticket-02: nhặt đom đóm (XZ ≤ 1 m), mang tối đa 10, nạp vào L1 (0,0,25) trong 2 m -> thắp đèn; +10/đom đóm nạp, +100/đèn",
+ "seed": 1,
+ "ticks": 300,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "motes": [
+   [
+    0,
+    0,
+    2
+   ],
+   [
+    0,
+    0,
+    4
+   ],
+   [
+    0,
+    0,
+    6
+   ],
+   [
+    0,
+    0,
+    8
+   ],
+   [
+    0,
+    0,
+    10
+   ],
+   [
+    0,
+    0,
+    12
+   ],
+   [
+    0,
+    0,
+    14
+   ],
+   [
+    0,
+    0,
+    16
+   ],
+   [
+    0,
+    0,
+    18
+   ],
+   [
+    0,
+    0,
+    20
+   ]
+  ]
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "move": [
+     0,
+     1
     ]
-  }
+   },
+   {
+    "tick": 235,
+    "move": [
+     0,
+     0
+    ]
+   },
+   {
+    "tick": 240,
+    "interact": true
+   }
+  ]
+ },
+ "expect": {
+  "end_state": "playing",
+  "end_score": 200,
+  "events": [
+   {
+    "name": "mote_picked",
+    "data": {
+     "carried": 1
+    }
+   },
+   {
+    "name": "mote_picked",
+    "data": {
+     "carried": 10
+    }
+   },
+   {
+    "name": "deposit",
+    "tick": 241,
+    "data": {
+     "lantern_id": "L1",
+     "amount": 10,
+     "deposited": 10
+    }
+   },
+   {
+    "name": "lantern_lit",
+    "tick": 241,
+    "data": {
+     "lantern_id": "L1"
+    }
+   }
+  ]
+ }
 }

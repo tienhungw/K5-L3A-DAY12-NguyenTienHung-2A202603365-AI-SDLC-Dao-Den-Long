@@ -1,0 +1,80 @@
+{
+ "requirement": "Bùa Gió (Đêm 2, C1 tại (35,0,0)): nhặt -> 600 tick, chạy 7.2 m/s, lướt không hồi chiêu",
+ "night": 2,
+ "seed": 1,
+ "ticks": 80,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    35,
+    0,
+    0.5
+   ]
+  }
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 1,
+    "move": [
+     1,
+     0
+    ]
+   },
+   {
+    "tick": 61,
+    "move": [
+     0,
+     0
+    ]
+   },
+   {
+    "tick": 65,
+    "dash": true
+   },
+   {
+    "tick": 66,
+    "dash": false
+   },
+   {
+    "tick": 78,
+    "dash": true
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "charm_picked",
+    "tick": 1,
+    "data": {
+     "charm_id": "C1",
+     "charm_ticks": 600
+    }
+   },
+   {
+    "name": "dash",
+    "tick": 66
+   },
+   {
+    "name": "dash",
+    "tick": 79
+   }
+  ],
+  "player_pos_at": [
+   {
+    "tick": 61,
+    "pos": [
+     42.2,
+     0,
+     0.5
+    ]
+   }
+  ]
+ }
+}

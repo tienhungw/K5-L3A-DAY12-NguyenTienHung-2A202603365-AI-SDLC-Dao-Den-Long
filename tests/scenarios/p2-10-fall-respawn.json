@@ -1,0 +1,60 @@
+{
+ "requirement": "Rơi khỏi đảo (Y < -10): đúng 1 lần, -1 lửa, mất hết đom đóm (lost), chờ 60 tick rồi hồi sinh ở điểm xuất phát",
+ "seed": 1,
+ "ticks": 200,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    39.5,
+    0,
+    0
+   ],
+   "carried": 4
+  }
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "move": [
+     1,
+     0
+    ]
+   },
+   {
+    "tick": 10,
+    "move": [
+     0,
+     0
+    ]
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "player_hit",
+    "data": {
+     "by": "fall",
+     "flames": 2,
+     "dropped": 0,
+     "lost": 4
+    }
+   }
+  ],
+  "last_snapshot": {
+   "player.pos": [
+    0,
+    0,
+    0
+   ],
+   "player.flames": 2,
+   "player.carried": 0
+  }
+ }
+}

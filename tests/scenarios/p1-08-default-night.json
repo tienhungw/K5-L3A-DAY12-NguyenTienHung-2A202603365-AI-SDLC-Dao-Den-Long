@@ -1,8 +1,58 @@
 {
-  "requirement": "Contract: thế giới mặc định (đom đóm/Bóng Mực ngẫu nhiên theo seed) chạy trọn 4800 tick, tất định, có shade_spawned với id mới",
-  "seed": 2024, "ticks": 4800, "snapshot_every": 60,
-  "scenario": { "player": { "pos": [-17.119, 0, 5.562] }, "lanterns": [{ "id": "L5", "lit": true }] },
-  "expect": { "end_state": "playing", "end_ticks": 4800,
-    "events": [{ "name": "shade_spawned", "tick": 2400, "data": { "id": "S3" } }, { "name": "shade_spawned", "tick": 4800, "data": { "id": "S4" } }],
-    "no_events": ["player_hit"] }
+ "requirement": "Ticket-02: lịch sinh Đêm 1 (2 bóng ở tick 300, rồi mỗi 480 tick, tối đa 6), tất định theo seed",
+ "seed": 2024,
+ "ticks": 4800,
+ "snapshot_every": 60,
+ "scenario": {
+  "player": {
+   "pos": [
+    -23.8,
+    0,
+    7.7
+   ]
+  },
+  "lanterns": [
+   {
+    "id": "L5",
+    "lit": true
+   }
+  ]
+ },
+ "expect": {
+  "end_state": "playing",
+  "end_ticks": 4800,
+  "events": [
+   {
+    "name": "shade_spawned",
+    "tick": 300,
+    "data": {
+     "id": "S1"
+    }
+   },
+   {
+    "name": "shade_spawned",
+    "tick": 300,
+    "data": {
+     "id": "S2"
+    }
+   },
+   {
+    "name": "shade_spawned",
+    "tick": 780,
+    "data": {
+     "id": "S3"
+    }
+   },
+   {
+    "name": "shade_spawned",
+    "tick": 2220,
+    "data": {
+     "id": "S6"
+    }
+   }
+  ],
+  "no_events": [
+   "player_hit"
+  ]
+ }
 }

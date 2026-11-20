@@ -1,0 +1,18 @@
+{
+ "requirement": "Đêm 3: mỗi 30 s một cơn gió 5 s hướng ngẫu nhiên (tất định theo seed) đẩy 2 m/s",
+ "night": 3,
+ "seed": 11,
+ "ticks": 2100,
+ "snapshot_every": 50,
+ "scenario": {
+  "random_shades": false,
+  "random_motes": false,
+  "random_drifters": false
+ },
+ "expect": {
+  "end_ticks": 2100,
+  "last_snapshot": {
+   "wind.active": false
+  }
+ }
+}

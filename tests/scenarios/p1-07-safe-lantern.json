@@ -1,9 +1,60 @@
 {
-  "requirement": "PRD-0 'Bóng sợ đèn': Bóng Mực không vào safe_radius (3 m) quanh đèn đã thắp; đứng cạnh đèn là an toàn",
-  "seed": 1, "ticks": 1800, "snapshot_every": 3,
-  "scenario": { "random_motes": false, "random_shades": false,
-    "player": { "pos": [0, 0, 18] }, "lanterns": [{ "id": "L1", "lit": true }],
-    "shades": [{ "pos": [0, 1, 8] }, { "pos": [6, 1, 18] }, { "pos": [-1, 1, 19.5] }] },
-  "expect": { "end_state": "playing", "no_events": ["player_hit"],
-    "min_shade_dist_to": { "pos": [0, 0, 18], "gt": 3 } }
+ "requirement": "Ticket-02: Bóng Mực bị chặn ở mép 6 m quanh đèn đã thắp; đứng cạnh đèn là an toàn",
+ "seed": 1,
+ "ticks": 1800,
+ "snapshot_every": 3,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "player": {
+   "pos": [
+    0,
+    0,
+    25
+   ]
+  },
+  "lanterns": [
+   {
+    "id": "L1",
+    "lit": true
+   }
+  ],
+  "shades": [
+   {
+    "pos": [
+     0,
+     1,
+     15
+    ]
+   },
+   {
+    "pos": [
+     8,
+     1,
+     25
+    ]
+   },
+   {
+    "pos": [
+     -3,
+     1,
+     33
+    ]
+   }
+  ]
+ },
+ "expect": {
+  "end_state": "playing",
+  "no_events": [
+   "player_hit"
+  ],
+  "min_shade_dist_to": {
+   "pos": [
+    0,
+    0,
+    25
+   ],
+   "gt": 5.999
+  }
+ }
 }

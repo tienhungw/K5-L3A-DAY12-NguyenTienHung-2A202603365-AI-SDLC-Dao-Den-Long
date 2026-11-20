@@ -1,0 +1,29 @@
+{
+ "requirement": "Đêm 3: bục nhảy (0,3,13) vy 12 + 8 m/s hướng -Z -> đáp lên tầng 2 (Y=6)",
+ "night": 3,
+ "seed": 1,
+ "ticks": 90,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    0,
+    3,
+    13
+   ]
+  }
+ },
+ "expect": {
+  "no_events": [
+   "player_hit"
+  ],
+  "last_snapshot": {
+   "player.grounded": true,
+   "player.pos.1": 6
+  }
+ }
+}

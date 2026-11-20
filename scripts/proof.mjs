@@ -17,7 +17,7 @@ const scDir = join(ROOT, 'tests', 'scenarios');
 const files = readdirSync(scDir).filter((f) => f.endsWith('.json')).sort();
 
 function runCli(spec, name, out) {
-  const args = [join(ROOT, 'src', 'headless.js'), '--seed', String(spec.seed ?? 1), '--night', '1', '--ticks', String(spec.ticks), '--out', out];
+  const args = [join(ROOT, 'src', 'headless.js'), '--seed', String(spec.seed ?? 1), '--night', String(spec.night ?? 1), '--ticks', String(spec.ticks), '--out', out];
   if (spec.scenario) { const p = join(work, name + '.scenario.json'); writeFileSync(p, JSON.stringify(spec.scenario)); args.push('--scenario', p); }
   if (spec.inputs) { const p = join(work, name + '.inputs.json'); writeFileSync(p, JSON.stringify(spec.inputs)); args.push('--inputs', p); }
   if (spec.snapshot_every) args.push('--snapshot-every', String(spec.snapshot_every));
@@ -47,6 +47,10 @@ function check(expect, lines) {
       if (i >= events.length) { fails.push(`missing event (in order): ${JSON.stringify(want)}`); break; }
       i++;
     }
+  }
+  for (const [k, v] of Object.entries(expect.last_snapshot || {})) {
+    const got = k.split('.').reduce((o, key) => o?.[key], snaps.at(-1));
+    if (JSON.stringify(got) !== JSON.stringify(v)) fails.push(`last snapshot ${k} = ${JSON.stringify(got)}, expected ${JSON.stringify(v)}`);
   }
   for (const n of expect.no_events || []) if (events.some((e) => e.name === n)) fails.push(`unexpected event ${n}`);
   if (expect.min_shade_dist_to) {
@@ -80,7 +84,7 @@ for (const f of files) {
   if (!deterministic) fails.push('two runs differ (non-deterministic)');
   const ok = fails.length === 0;
   allOk &&= ok;
-  rows.push({ name, requirement: spec.requirement, ok, deterministic, ms: a.ms, fails });
+  rows.push({ name, night: spec.night ?? 1, requirement: spec.requirement, ok, deterministic, ms: a.ms, fails });
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}  (${a.ms.toFixed(0)} ms)${ok ? '' : '\n      ' + fails.join('\n      ')}`);
 }
 
@@ -92,9 +96,9 @@ const md = [
   '',
   `Machine: ${platform()} ${release()}, ${cpus()[0]?.model?.trim()} x${cpus().length}, ${(totalmem() / 2 ** 30).toFixed(1)} GB RAM, Node ${process.version}`,
   '',
-  '| Scenario | Requirement | Result | Deterministic | Run time |',
-  '|---|---|---|---|---|',
-  ...rows.map((r) => `| [${r.name}](../../../tests/scenarios/${r.name}.json) | ${r.requirement} | ${r.ok ? 'PASS' : 'FAIL: ' + r.fails.join('; ')} | ${r.deterministic ? 'yes' : 'NO'} | ${r.ms.toFixed(0)} ms |`),
+  '| Scenario | Night | Requirement | Result | Deterministic | Run time |',
+  '|---|---|---|---|---|---|',
+  ...rows.map((r) => `| [${r.name}](../../../tests/scenarios/${r.name}.json) | ${r.night} | ${r.requirement} | ${r.ok ? 'PASS' : 'FAIL: ' + r.fails.join('; ')} | ${r.deterministic ? 'yes' : 'NO'} | ${r.ms.toFixed(0)} ms |`),
   '',
   `**${rows.filter((r) => r.ok).length}/${rows.length} scenarios pass.** Raw outputs: \`*.jsonl\` in this folder.`,
   '',

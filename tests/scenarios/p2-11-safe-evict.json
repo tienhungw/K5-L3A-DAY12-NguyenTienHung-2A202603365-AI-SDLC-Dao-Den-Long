@@ -1,0 +1,48 @@
+{
+ "requirement": "Bóng đang ở trong vùng lúc đèn vừa thắp bị đẩy ra mép 6 m trong ≤ 30 tick, không gây sát thương",
+ "seed": 1,
+ "ticks": 120,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    0,
+    0,
+    23
+   ],
+   "carried": 10
+  },
+  "shades": [
+   {
+    "pos": [
+     0,
+     1,
+     23.5
+    ]
+   }
+  ]
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "interact": true
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "lantern_lit",
+    "tick": 1
+   }
+  ],
+  "no_events": [
+   "player_hit"
+  ]
+ }
+}

@@ -1,0 +1,29 @@
+{
+ "requirement": "Đêm 2: bục nhảy (20,0,18) phóng vy 14 + 24 m/s về đảo B, đáp an toàn; 330 s",
+ "night": 2,
+ "seed": 1,
+ "ticks": 120,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    20,
+    0,
+    18
+   ]
+  }
+ },
+ "expect": {
+  "no_events": [
+   "player_hit"
+  ],
+  "last_snapshot": {
+   "player.grounded": true,
+   "time_left_s": 328
+  }
+ }
+}
