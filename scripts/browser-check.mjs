@@ -55,9 +55,13 @@ async function shot(name, url, waitMs, before) {
   await send('Page.navigate', { url: base + url });
   await sleep(waitMs);
   if (before) { await evaluate(before); await sleep(700); }
-  const { result } = await send('Page.captureScreenshot', { format: 'png' });
-  writeFileSync(join(outDir, name + '.png'), Buffer.from(result.data, 'base64'));
-  console.log('shot', name);
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const res = await send('Page.captureScreenshot', { format: 'png' });
+    if (res.result?.data) { writeFileSync(join(outDir, name + '.png'), Buffer.from(res.result.data, 'base64')); console.log('shot', name); return; }
+    console.log(`shot ${name} attempt ${attempt} failed: ${JSON.stringify(res.error)}`);
+    await sleep(1500);
+  }
+  errors.push(`screenshot ${name} failed`);
 }
 
 const report = [];
@@ -69,6 +73,11 @@ await shot('05-night3-tiers', '/?autoplay&seed=5&night=3&skip=60', 5000);
 await shot('06-pause-menu', '/?autoplay&seed=5&night=1&skip=10', 2500, "document.dispatchEvent(new KeyboardEvent('keydown',{code:'Escape'})); window.dispatchEvent(new KeyboardEvent('keydown',{code:'Escape'}))");
 await shot('07-intro', '/', 2000, "document.getElementById('btnStart').click()");
 await shot('08-low-time', '/?autoplay&seed=5&night=1&skip=1', 2000, 'window.__game.world.timeStart = 25.4 + window.__game.world.simTick / 60');
+// Phase 3: low-fuel lanterns (1 Hz blink, red fuel bar, no safe ring), colour-blind palette, dawn result
+await shot('09-low-fuel', '/?seed=4&night=1', 2500, "document.getElementById('btnPlay').click(); const w = window.__game.world, l = w.lanterns[0]; l.lit = true; l.everLit = true; l.fuelU = 25 * 60; w.player.pos = { x: l.pos.x, y: 0, z: l.pos.z - 6 }; w.lanterns[1].lit = true; w.lanterns[1].everLit = true; w.lanterns[1].fuelU = 80 * 60;");
+await shot('10-colorblind', '/?autoplay&seed=4&night=1&skip=100', 3000, "localStorage.setItem('ddl-settings', JSON.stringify({ volume: 0.7, sens: 0.6, colorblind: true })); location.reload()");
+await send('Runtime.evaluate', { expression: "localStorage.removeItem('ddl-settings')" });
+await shot('11-dawn-result', '/?autoplay&seed=5&night=1&skip=240', 2200);
 
 // FPS: let the bot play Night 1 at 1280x720 and average per-second samples (first 3 s discarded as warm-up)
 await send('Page.navigate', { url: base + '/?autoplay&seed=4&night=1&fps' });

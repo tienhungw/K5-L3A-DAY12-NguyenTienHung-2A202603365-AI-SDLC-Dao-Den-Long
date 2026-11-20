@@ -1,6 +1,6 @@
 // Demo bot for ?autoplay (screenshots / video / FPS benchmark). Produces the same contract inputs a player would.
 // Simple waypoint navigation per night: bridge on Night 2, ramps + jump pad on Night 3.
-import { distXZ } from '/sim/world.js';
+import { distXZ, capacity } from '/sim/world.js';
 
 const level = (y) => (y > 4.5 ? 2 : y > 1.5 ? 1 : 0);
 const RAMPS = [30, 150].map((d) => (d * Math.PI) / 180);
@@ -57,12 +57,13 @@ export function autopilot(T) {
     const threat = w.shades.find((s) => (s.state === 'chase' || s.state === 'wander') && distXZ(s.pos, p.pos) < 3.2);
     const thief = w.drifters.find((d) => d.state === 'chase' && distXZ(d.pos, p.pos) < 4);
     if ((threat || thief) && p.carried >= T.pulse_cost && tick % 2 === 0) out.pulse = true;
-    const unlit = w.lanterns.filter((l) => !l.lit);
+    // Phase 3: lanterns needing care = unlit, or lit with < 60 fuel (refuel before they go out)
+    const unlit = w.lanterns.filter((l) => !l.lit || l.fuelU < 60 * 60);
     const lantern = unlit.sort((a, b) => distXZ(a.pos, p.pos) + 8 * Math.abs(a.pos.y - p.pos.y) - (distXZ(b.pos, p.pos) + 8 * Math.abs(b.pos.y - p.pos.y)))[0];
-    const need = lantern ? T.lantern_cost - lantern.deposited : 0;
+    const need = lantern ? (lantern.lit ? Math.ceil((6000 - lantern.fuelU) / 600) : (lantern.everLit ? T.relight_cost : T.lantern_cost) - lantern.deposited) : 0;
     let target = null;
     const reachable = w.motes.filter((m) => w.night !== 3 || Math.abs(m.pos.y - p.pos.y) < 1.6);
-    if (lantern && p.carried > 0 && (p.carried >= T.carry_capacity || p.carried >= need || !reachable.length)) target = lantern.pos;
+    if (lantern && p.carried > 0 && (p.carried >= capacity(w) || p.carried >= need || !reachable.length)) target = lantern.pos;
     else if (reachable.length) target = reachable.reduce((a, b) => (distXZ(a.pos, p.pos) < distXZ(b.pos, p.pos) ? a : b)).pos;
     else if (w.motes.length) target = w.motes[0].pos;
     let dx = 0, dz = 0;

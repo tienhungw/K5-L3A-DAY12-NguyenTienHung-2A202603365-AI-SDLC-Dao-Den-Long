@@ -22,6 +22,9 @@
   #timer small { display: block; font-size: 11px; opacity: .75; }
   #timer.danger { color: var(--danger); border-color: var(--danger); animation: blink 1s steps(2, start) infinite; }
   @keyframes blink { to { visibility: hidden; } }
+  /* Ticket-03 §6: colour-blind mode — UI danger becomes white + ⚠ */
+  body.cb { --danger: #FFFFFF; }
+  body.cb #timer.danger #time::before { content: "⚠ "; }
   #topRight { top: 14px; right: 14px; text-align: right; font-size: 15px; line-height: 1.5; }
   #topRight .score { color: var(--gold); font-size: 24px; font-variant-numeric: tabular-nums; }
   #moteBar { bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; padding: 8px 10px; }
@@ -113,6 +116,7 @@
   <h2>Cài đặt</h2>
   <label>Âm lượng <input type="range" id="vol" min="0" max="1" step="0.05"></label>
   <label>Độ nhạy chuột <input type="range" id="sens" min="0.1" max="1.5" step="0.05"></label>
+  <label>Bảng màu dễ phân biệt (mù màu) <input type="checkbox" id="cbMode" style="width:22px;height:22px;accent-color:var(--lamp)"></label>
   <p class="small">Được lưu lại cho lần mở game sau.</p>
   <div class="btns"><button id="btnSettingsBack">Xong</button></div>
 </div>
