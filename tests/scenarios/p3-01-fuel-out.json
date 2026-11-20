@@ -1,0 +1,36 @@
+{
+ "requirement": "Ticket-03 §1: dầu hao 1/s; fuel ≤ 0 -> lantern_out, deposited 0, ever_lit giữ true",
+ "seed": 1,
+ "ticks": 130,
+ "snapshot_every": 10,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "lanterns": [
+   {
+    "id": "L1",
+    "lit": true,
+    "fuel": 2
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "lantern_out",
+    "tick": 120,
+    "data": {
+     "lantern_id": "L1"
+    }
+   }
+  ],
+  "last_snapshot": {
+   "lanterns.0.lit": false,
+   "lanterns.0.fuel": 0,
+   "lanterns.0.deposited": 0,
+   "lanterns.0.ever_lit": true
+  }
+ }
+}

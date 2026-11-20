@@ -1,0 +1,47 @@
+{
+ "requirement": "Ticket-03 §3: đèn tắt ngay tick bình minh không được tính -> 2/5 -> lost/dawn",
+ "seed": 1,
+ "ticks": 1000,
+ "snapshot_every": 100,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "lanterns": [
+   {
+    "id": "L1",
+    "lit": true
+   },
+   {
+    "id": "L2",
+    "lit": true
+   },
+   {
+    "id": "L3",
+    "lit": true,
+    "fuel": 10
+   }
+  ],
+  "time_left_s": 10
+ },
+ "expect": {
+  "end_state": "lost",
+  "end_ticks": 600,
+  "end_score": 0,
+  "events": [
+   {
+    "name": "lantern_out",
+    "tick": 600
+   },
+   {
+    "name": "game_over",
+    "tick": 600,
+    "data": {
+     "result": "lost",
+     "reason": "dawn"
+    }
+   }
+  ]
+ }
+}

@@ -1,7 +1,7 @@
 {
- "requirement": "Ván thắng trọn vẹn Đêm 1 (bản đồ chuẩn): gom 50 đom đóm, thắp 5 đèn -> won/all_lit, điểm dự đoán độc lập",
+ "requirement": "Đêm 1 (bản đồ chuẩn): gom 50 đom đóm, thắp đủ 5 đèn -> Đêm KHÔNG kết thúc sớm (Ticket-03); điểm dự đoán độc lập",
  "seed": 1,
- "ticks": 6000,
+ "ticks": 1492,
  "snapshot_every": 60,
  "scenario": {
   "random_motes": false,
@@ -344,51 +344,49 @@
   ]
  },
  "expect": {
-  "end_state": "won",
-  "end_ticks": 1432,
-  "end_score": 1702,
+  "end_state": "playing",
+  "end_ticks": 1492,
+  "end_score": 750,
   "events": [
    {
     "name": "lantern_lit",
     "data": {
-     "lantern_id": "L1"
+     "lantern_id": "L1",
+     "relight": false
     }
    },
    {
     "name": "lantern_lit",
     "data": {
-     "lantern_id": "L2"
+     "lantern_id": "L2",
+     "relight": false
     }
    },
    {
     "name": "lantern_lit",
     "data": {
-     "lantern_id": "L3"
+     "lantern_id": "L3",
+     "relight": false
     }
    },
    {
     "name": "lantern_lit",
     "data": {
-     "lantern_id": "L4"
+     "lantern_id": "L4",
+     "relight": false
     }
    },
    {
     "name": "lantern_lit",
     "data": {
-     "lantern_id": "L5"
-    }
-   },
-   {
-    "name": "game_over",
-    "tick": 1432,
-    "data": {
-     "result": "won",
-     "reason": "all_lit"
+     "lantern_id": "L5",
+     "relight": false
     }
    }
   ],
   "no_events": [
-   "player_hit"
+   "player_hit",
+   "game_over"
   ]
  }
 }

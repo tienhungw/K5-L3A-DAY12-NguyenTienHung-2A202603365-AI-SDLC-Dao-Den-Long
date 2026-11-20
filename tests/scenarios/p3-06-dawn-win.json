@@ -1,0 +1,42 @@
+{
+ "requirement": "Ticket-03 §3/§5: bình minh còn 3/5 đèn sáng -> won/dawn_survived; thưởng Σ(50+floor(fuel)) + 50·lửa",
+ "seed": 1,
+ "ticks": 4000,
+ "snapshot_every": 600,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "lanterns": [
+   {
+    "id": "L1",
+    "lit": true
+   },
+   {
+    "id": "L2",
+    "lit": true
+   },
+   {
+    "id": "L3",
+    "lit": true
+   }
+  ],
+  "time_left_s": 50
+ },
+ "expect": {
+  "end_state": "won",
+  "end_ticks": 3000,
+  "end_score": 450,
+  "events": [
+   {
+    "name": "game_over",
+    "tick": 3000,
+    "data": {
+     "result": "won",
+     "reason": "dawn_survived"
+    }
+   }
+  ]
+ }
+}

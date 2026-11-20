@@ -1,0 +1,63 @@
+{
+ "requirement": "Ticket-03 §5: Tỏa Sáng trúng Bóng Mực đang drain = +15; hết choáng về wander",
+ "seed": 1,
+ "ticks": 121,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    0,
+    0,
+    22.5
+   ],
+   "carried": 3
+  },
+  "lanterns": [
+   {
+    "id": "L1",
+    "lit": true,
+    "fuel": 20
+   }
+  ],
+  "shades": [
+   {
+    "pos": [
+     0,
+     1,
+     26.5
+    ],
+    "state": "drain",
+    "target_lantern_id": "L1"
+   }
+  ]
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "pulse": true
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "pulse",
+    "tick": 1,
+    "data": {
+     "stunned_ids": [
+      "S1"
+     ]
+    }
+   }
+  ],
+  "end_score": 15,
+  "last_snapshot": {
+   "shades.0.state": "wander"
+  }
+ }
+}

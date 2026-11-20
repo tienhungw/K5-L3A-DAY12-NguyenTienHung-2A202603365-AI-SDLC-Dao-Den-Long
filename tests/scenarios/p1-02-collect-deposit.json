@@ -1,5 +1,5 @@
 {
- "requirement": "PRD-0 + Ticket-02: nhặt đom đóm (XZ ≤ 1 m), mang tối đa 10, nạp vào L1 (0,0,25) trong 2 m -> thắp đèn; +10/đom đóm nạp, +100/đèn",
+ "requirement": "PRD-0 + Ticket-03: nhặt đom đóm, nạp 10 vào L1 -> thắp; +5/đom đóm nạp, +100 thắp lần đầu (Phase 3: điểm mote 10 -> 5)",
  "seed": 1,
  "ticks": 300,
  "scenario": {
@@ -82,7 +82,7 @@
  },
  "expect": {
   "end_state": "playing",
-  "end_score": 200,
+  "end_score": 150,
   "events": [
    {
     "name": "mote_picked",
@@ -109,7 +109,8 @@
     "name": "lantern_lit",
     "tick": 241,
     "data": {
-     "lantern_id": "L1"
+     "lantern_id": "L1",
+     "relight": false
     }
    }
   ]

@@ -1,0 +1,52 @@
+{
+ "requirement": "Ticket-03 §1: châm dầu used = min(mang, ceil((100-fuel)/10)), fuel = min(100, fuel+10·used), +5/đom đóm",
+ "seed": 1,
+ "ticks": 1,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    0,
+    0,
+    24
+   ],
+   "carried": 7
+  },
+  "lanterns": [
+   {
+    "id": "L1",
+    "lit": true,
+    "fuel": 50
+   }
+  ]
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "interact": true
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "refuel",
+    "tick": 1,
+    "data": {
+     "lantern_id": "L1",
+     "amount": 6,
+     "fuel": 100
+    }
+   }
+  ],
+  "end_score": 30,
+  "last_snapshot": {
+   "player.carried": 1
+  }
+ }
+}

@@ -1,0 +1,65 @@
+{
+ "requirement": "Ticket-03 §2: Bóng Mực wander tới đèn yếu (<30), drain 5/s, fuel_drain mỗi 60 tick, đèn tắt -> wander",
+ "seed": 1,
+ "ticks": 320,
+ "snapshot_every": 10,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    0,
+    0,
+    -15
+   ]
+  },
+  "lanterns": [
+   {
+    "id": "L1",
+    "lit": true,
+    "fuel": 20
+   }
+  ],
+  "shades": [
+   {
+    "pos": [
+     0,
+     1,
+     30
+    ]
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "fuel_drain",
+    "tick": 180,
+    "data": {
+     "lantern_id": "L1",
+     "shade_id": "S1",
+     "fuel": 12
+    }
+   },
+   {
+    "name": "fuel_drain",
+    "tick": 240,
+    "data": {
+     "fuel": 6
+    }
+   },
+   {
+    "name": "lantern_out",
+    "tick": 300,
+    "data": {
+     "lantern_id": "L1"
+    }
+   }
+  ],
+  "last_snapshot": {
+   "shades.0.state": "wander"
+  }
+ }
+}

@@ -17,16 +17,17 @@ const file = (name, content) => {
   return p;
 };
 
-// Phase 2: contract bumped to v1.1 and tuning must equal Ticket-02 standard numbers (was: my own Phase 1 numbers).
-test('game.contract.json is v1.1 with Ticket-02 standard numbers', () => {
+// Phase 2: contract v1.1 standard numbers. Phase 3: v1.2 — durations 240/270/300, fuel keys, new score table (Ticket-03 §5, §7).
+test('game.contract.json is v1.2 with Ticket-02/03 standard numbers', () => {
   for (const k of ['contract_version', 'team', 'build_cmd', 'run_cmd', 'headless_cmd', 'tuning']) assert.ok(k in contract, k);
-  assert.equal(contract.contract_version, '1.1');
+  assert.equal(contract.contract_version, '1.2');
   assert.deepEqual(contract.tuning, {
     player_speed: 6.0, carry_capacity: 10, lantern_cost: 10, lantern_count_night1: 5, pickup_radius: 1.0, interact_radius: 2.0,
-    pulse_cost: 3, pulse_radius: 5.0, night1_duration_s: 300, night2_duration_s: 330, night3_duration_s: 360, flames: 3,
+    pulse_cost: 3, pulse_radius: 5.0, night1_duration_s: 240, night2_duration_s: 270, night3_duration_s: 300, flames: 3,
     invuln_s: 1.5, hit_drop_ratio: 0.5, pulse_stun_s: 2.0, pulse_push_m: 4.0, pulse_cooldown_s: 3.0, safe_radius: 6.0,
     shade_speed: 4.0, shade_hit_radius: 1.0, fall_enabled: true, dash_speed: 14.0, dash_duration_s: 0.2, dash_cooldown_s: 1.5,
-    score: { per_mote: 10, per_lantern: 100, per_stun: 5, per_second_left: 2, per_flame_left: 50 },
+    score: { per_mote: 5, per_lantern: 100, per_stun: 5, per_second_left: 0, per_flame_left: 50 },
+    fuel_max: 100, fuel_decay_per_s: 1.0, fuel_per_mote: 10, relight_cost: 5, win_ratio: 0.6, drain_per_s: 5, low_fuel_threshold: 30, capacity_max: 20,
   });
 });
 
@@ -44,19 +45,23 @@ test('CLI writes JSONL: snapshot 0 first, end last, exit 0', () => {
   assert.deepEqual(snaps.map((s) => s.tick), [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120]);
 });
 
-// Phase 2: v1.1 snapshot fields added (night, wind, player.vel/grounded/invuln/cooldowns, motes kind/ttl, drifters, charms).
-test('snapshot has all v1.1 contract fields', () => {
+// Phase 2: v1.1 snapshot fields. Phase 3: + lantern fuel/ever_lit/relit_count, player.capacity, durations 240/270/300.
+test('snapshot has all v1.2 contract fields', () => {
   for (const night of [1, 2, 3]) {
     const s = run({ ticks: 1, night }).snaps[0];
     for (const k of ['type', 'tick', 'sim_tick', 'state', 'night', 'time_left_s', 'score', 'wind', 'player', 'lanterns', 'shades', 'motes_active', 'motes', 'drifters', 'charms']) assert.ok(k in s, k);
     assert.equal(s.night, night);
     assert.deepEqual(Object.keys(s.wind).sort(), ['active', 'dir_deg']);
-    assert.deepEqual(Object.keys(s.player).sort(), ['carried', 'charm_s', 'dash_cd_s', 'flames', 'grounded', 'invuln', 'pos', 'pulse_cd_s', 'vel']);
+    assert.deepEqual(Object.keys(s.player).sort(), ['capacity', 'carried', 'charm_s', 'dash_cd_s', 'flames', 'grounded', 'invuln', 'pos', 'pulse_cd_s', 'vel']);
+    assert.equal(s.player.capacity, 10);
     assert.equal(s.lanterns.length, [0, 5, 6, 7][night]);
-    for (const l of s.lanterns) assert.deepEqual(Object.keys(l).sort(), ['deposited', 'id', 'lit', 'pos']);
+    for (const l of s.lanterns) {
+      assert.deepEqual(Object.keys(l).sort(), ['deposited', 'ever_lit', 'fuel', 'id', 'lit', 'pos', 'relit_count']);
+      assert.deepEqual([l.fuel, l.ever_lit, l.relit_count], [0, false, 0]);
+    }
     for (const m of s.motes) { assert.deepEqual(Object.keys(m).sort(), ['id', 'kind', 'pos', 'ttl_s']); assert.equal(m.kind, 'random'); assert.equal(m.ttl_s, null); }
     assert.equal(s.motes_active, 20);
-    assert.equal(s.time_left_s, [0, 300, 330, 360][night]);
+    assert.equal(s.time_left_s, [0, 240, 270, 300][night]);
     for (const c of s.charms) for (const k of ['id', 'available', 'respawn_s']) assert.ok(k in c);
     assert.deepEqual(s.charms.map((c) => c.id), [[], [], ['C1'], ['C1', 'C2']][night]);
   }

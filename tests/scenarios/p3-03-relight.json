@@ -1,0 +1,52 @@
+{
+ "requirement": "Ticket-03 §1/§4/§5: đèn từng sáng thắp lại bằng 5 đom đóm, +25 +40, relight: true, sức chứa 12",
+ "seed": 1,
+ "ticks": 2,
+ "snapshot_every": 1,
+ "scenario": {
+  "random_motes": false,
+  "random_shades": false,
+  "random_drifters": false,
+  "wind_enabled": false,
+  "player": {
+   "pos": [
+    0,
+    0,
+    24
+   ],
+   "carried": 5
+  },
+  "lanterns": [
+   {
+    "id": "L1",
+    "ever_lit": true
+   }
+  ]
+ },
+ "inputs": {
+  "frames": [
+   {
+    "tick": 0,
+    "interact": true
+   }
+  ]
+ },
+ "expect": {
+  "events": [
+   {
+    "name": "lantern_lit",
+    "tick": 1,
+    "data": {
+     "lantern_id": "L1",
+     "relight": true
+    }
+   }
+  ],
+  "end_score": 65,
+  "last_snapshot": {
+   "player.capacity": 12,
+   "lanterns.0.relit_count": 1,
+   "lanterns.0.fuel": 100
+  }
+ }
+}

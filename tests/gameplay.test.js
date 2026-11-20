@@ -88,13 +88,14 @@ test('carry capacity is 10', () => {
   assert.equal(r.last.motes_active, 2);
 });
 
-test('deposit: +10 per mote deposited, lantern remembers progress across visits', () => {
+// Phase 3: +5 per mote deposited (was +10, Ticket-03 §5).
+test('deposit: +5 per mote deposited, lantern remembers progress across visits', () => {
   const r = run({
     scenario: quiet({ player: { pos: [0, 0, 23], carried: 4 } }),
     inputs: { frames: [{ tick: 0, interact: true }] }, ticks: 2, every: 1,
   });
   assert.deepEqual(r.ev('deposit')[0].data, { lantern_id: 'L1', amount: 4, deposited: 4 });
-  assert.equal(r.last.score, 40);
+  assert.equal(r.last.score, 20);
   assert.equal(r.last.lanterns[0].deposited, 4);
   assert.equal(r.ev('lantern_lit').length, 0);
 });
@@ -106,45 +107,43 @@ test('interact outside 2.0 m does nothing; holding interact deposits only once',
   assert.equal(r.ev('deposit').length, 1);
 });
 
-test('lantern choice: nearest unlit; ties -> smaller id; lit lanterns are skipped', () => {
+// Phase 3: lit lanterns are no longer skipped — a lit lantern that is not full is a refuel candidate (Ticket-03 §1).
+// Stage 2 burns fuel before stage 5, so a lit lantern is never exactly full when E is pressed.
+test('lantern choice: nearest acceptable lantern; ties -> smaller id; a lit lantern is refuelled', () => {
   // L2 moved to (0,0,21): L1 (0,0,25) and L2 are both exactly 2 m from (0,0,23).
   let r = run({ scenario: quiet({ player: { pos: [0, 0, 23], carried: 1 }, lanterns: [{ id: 'L2', pos: [0, 0, 21] }] }), inputs: { frames: [{ tick: 0, interact: true }] }, ticks: 1 });
   assert.equal(r.ev('deposit')[0].data.lantern_id, 'L1');
   r = run({ scenario: quiet({ player: { pos: [0, 0, 23], carried: 1 }, lanterns: [{ id: 'L1', lit: true }, { id: 'L2', pos: [0, 0, 21] }] }), inputs: { frames: [{ tick: 0, interact: true }] }, ticks: 1 });
-  assert.equal(r.ev('deposit')[0].data.lantern_id, 'L2');
+  assert.equal(r.ev('deposit').length, 0);
+  assert.deepEqual(r.ev('refuel')[0].data, { lantern_id: 'L1', amount: 1, fuel: 100 });
 });
 
-test('min(carried, missing) is deposited; reaching 10 lights the lantern (+100)', () => {
+// Phase 3: +5 per mote (was +10); lantern_lit carries relight:false.
+test('min(carried, missing) is deposited; reaching 10 lights the lantern (+100, fuel 100)', () => {
   const r = run({
     scenario: quiet({ player: { pos: [0, 0, 24], carried: 8 }, lanterns: [{ id: 'L1', deposited: 7 }] }),
     inputs: { frames: [{ tick: 0, interact: true }] }, ticks: 2, every: 1,
   });
   assert.deepEqual(r.ev('deposit')[0].data, { lantern_id: 'L1', amount: 3, deposited: 10 });
-  assert.deepEqual(r.ev('lantern_lit')[0].data, { lantern_id: 'L1' });
+  assert.deepEqual(r.ev('lantern_lit')[0].data, { lantern_id: 'L1', relight: false });
   assert.equal(r.last.player.carried, 5);
-  assert.equal(r.last.score, 30 + 100);
+  assert.equal(r.last.score, 15 + 100);
+  assert.equal(at(r, 1).lanterns[0].fuel, 100);
 });
 
-test('lighting the last lantern wins with bonus floor(time_left)*2 + 50*flames', () => {
+// Phase 3: REPLACED "lighting the last lantern wins" and "win beats dawn on the last tick" (Ticket-03 §3: no early win).
+test('lighting every lantern no longer ends the night', () => {
   const lanterns = ['L2', 'L3', 'L4', 'L5'].map((id) => ({ id, lit: true }));
   const r = run({ scenario: quiet({ player: { pos: [0, 0, 24], carried: 10 }, lanterns, time_left_s: 100 }), inputs: { frames: [{ tick: 0, interact: true }] }, ticks: 600 });
-  assert.deepEqual(r.ev('game_over')[0].data, { result: 'won', reason: 'all_lit' });
-  assert.equal(r.end.ticks, 1);
-  // 10 motes*10 + 100 + floor(100 - 1/60)=99 * 2 + 3*50
-  assert.equal(r.end.score, 100 + 100 + 198 + 150);
+  assert.equal(r.ev('lantern_lit').length, 1);
+  assert.equal(r.ev('game_over').length, 0);
+  assert.equal(r.end.state, 'playing');
 });
 
-test('win takes precedence over dawn on the very tick time runs out', () => {
-  const lanterns = ['L2', 'L3', 'L4', 'L5'].map((id) => ({ id, lit: true }));
-  const r = run({ scenario: quiet({ player: { pos: [0, 0, 24], carried: 10 }, lanterns, time_left_s: 1 }), inputs: { frames: [{ tick: 59, interact: true }] }, ticks: 600 });
-  assert.equal(r.end.ticks, 60);
-  assert.equal(r.end.state, 'won');
-  assert.equal(r.end.score, 100 + 100 + 0 + 150);
-});
-
-test('night timer: 300 s on Night 1 -> lost / dawn at tick 18000', () => {
+// Phase 3: Night 1 lasts 240 s (was 300 s); with 0 lit lanterns dawn is a loss.
+test('night timer: 240 s on Night 1 -> lost / dawn at tick 14400', () => {
   const r = run({ scenario: quiet(), ticks: 20000, every: 1000 });
-  assert.equal(r.end.ticks, 18000);
+  assert.equal(r.end.ticks, 14400);
   assert.deepEqual(r.ev('game_over')[0].data, { result: 'lost', reason: 'dawn' });
 });
 

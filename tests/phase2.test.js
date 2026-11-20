@@ -134,9 +134,10 @@ test('drifters ignore lantern safe zones; Night 2 spawns them at tick 1200 (max 
 });
 
 // ---------------- Night 2 map
-test('Night 2: 6 lanterns, 330 s, bridge holds, stepping off the bridge falls', () => {
+// Phase 3: Night 2 lasts 270 s (was 330 s).
+test('Night 2: 6 lanterns, 270 s, bridge holds, stepping off the bridge falls', () => {
   let r = run({ night: 2, scenario: quiet({ player: { pos: [20, 0, 0] } }), inputs: { frames: [{ tick: 0, move: [1, 0] }] }, ticks: 360, every: 60 });
-  assert.equal(r.snaps[0].time_left_s, 330);
+  assert.equal(r.snaps[0].time_left_s, 270);
   assert.deepEqual(r.snaps[0].lanterns.map((l) => l.pos), [[0, 0, 20], [17, 0, -10], [-17, 0, -10], [70, 0, 20], [87, 0, -10], [53, 0, -10]]);
   assert.equal(r.ev('player_hit').length, 0);
   assert.ok(r.last.player.pos[0] > 50 && r.last.player.grounded); // walked across into island B
@@ -160,9 +161,10 @@ test('jump-pad launch velocity ignores move input (still allows dash)', () => {
 });
 
 // ---------------- Night 3 map
-test('Night 3: 7 lanterns at their tier heights, 360 s, shade speed 4.5 m/s', () => {
+// Phase 3: Night 3 lasts 300 s (was 360 s).
+test('Night 3: 7 lanterns at their tier heights, 300 s, shade speed 4.5 m/s', () => {
   const r = run({ night: 3, scenario: quiet({ player: { pos: [30, 0, -30] }, shades: [{ pos: [33, 1, -30] }] }), ticks: 60, every: 1 });
-  assert.equal(r.snaps[0].time_left_s, 360);
+  assert.equal(r.snaps[0].time_left_s, 300);
   assert.deepEqual(r.snaps[0].lanterns.map((l) => l.pos[1]), [6, 3, 3, 0, 0, 0, 0]);
   // (3 - 1) / (4.5/60) = 26.7 -> hit at tick 27
   assert.equal(r.ev('player_hit')[0].tick, 27);

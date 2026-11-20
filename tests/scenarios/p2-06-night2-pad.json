@@ -1,5 +1,5 @@
 {
- "requirement": "Đêm 2: bục nhảy (20,0,18) phóng vy 14 + 24 m/s về đảo B, đáp an toàn; 330 s",
+ "requirement": "Đêm 2: bục nhảy (20,0,18) phóng vy 14 + 24 m/s về đảo B, đáp an toàn (Phase 3: Đêm 2 dài 270 s)",
  "night": 2,
  "seed": 1,
  "ticks": 120,
@@ -23,7 +23,7 @@
   ],
   "last_snapshot": {
    "player.grounded": true,
-   "time_left_s": 328
+   "time_left_s": 268
   }
  }
 }
