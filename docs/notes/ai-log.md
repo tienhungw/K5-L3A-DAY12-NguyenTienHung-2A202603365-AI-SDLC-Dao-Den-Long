@@ -37,3 +37,38 @@ Stop hook [scripts/stop-hook.mjs](../../scripts/stop-hook.mjs) (chặn agent k�
 - Viết code + test + docs Phase 1: ~45k token output.
 - Tổng ngữ cảnh tích lũy cả phiên (gửi lại mỗi lượt, phần lớn được cache): ước tính **~2–3 triệu token input**, **~50k output**. Số chính xác: xem `/cost` trong Claude Code.
 - Cách tiết kiệm: grep/strip HTML thay vì đọc toàn bộ lab board; viết test theo số liệu contract trước nên ít vòng sửa; một script proof dùng chung cho mọi phase; sim không phụ thuộc thư viện nên test chạy < 3 s.
+
+## Phase 2
+
+### Lời nhắc chính
+1. "Phase 2 đã có trong link artifact, hãy tiếp tục hoàn thiện phase 2" → agent không đọc được tab Phase 2 (nội dung tải động, cần đăng nhập) và **không đoán yêu cầu**, mà xin người dùng dán ticket.
+2. Người dùng dán nguyên văn Ticket-02 → lưu vào `docs/specs/phase-2-ticket-02.md` trước khi làm gì khác.
+3. Giữa phase: "thay nhạc nền bằng lab11nen.mp3, tiếng F bằng lab11duoi.mp3, tiếng E bằng lab11sang.mp3" → làm xong phần đang dở (scenario) rồi mới tích hợp.
+
+### Trình tự
+| Bước | Việc | Kết quả |
+|---|---|---|
+| 1 | Lưu spec, liệt kê chỗ mơ hồ | `docs/specs/phase-2-ticket-02.md`, 20 giả định B1–B20 |
+| 2 | Contract v1.1 + `maps.js` + viết lại `world.js` theo 12 bước | 3 Đêm chạy được, 0.2–0.6 s/Đêm |
+| 3 | Chạy test cũ → 15 test đỏ vì luật đổi | viết lại kèm lý do (bảng §4 trong phase-2.md) |
+| 4 | Test mới cho từng tính năng, kỳ vọng tính tay | 59/60 xanh lần đầu; 4 test sai do kỳ vọng của tôi (xem dưới) |
+| 5 | Cập nhật 8 scenario Phase 1 + 11 scenario Phase 2 | 20/20 PASS |
+| 6 | Renderer mới, âm thanh của người dùng | 0 lỗi console |
+| 7 | Đo FPS bằng Chrome/CDP → 25.8 FPS (chưa đạt) → tìm nguyên nhân → sửa | 43.6 FPS |
+| 8 | Docs, AGENTS.md, skill, tag `phase-2` | |
+
+### Lỗi của AI (và cách phát hiện / sửa)
+| # | Lỗi | Phát hiện bằng | Sửa | Chỉnh harness |
+|---|---|---|---|---|
+| 1 | Biến sai tên `p.vy` (đúng là `p.vel.y`) khi lướt trên không | tự review diff trước khi chạy | sửa | — |
+| 2 | Đẩy lùi Bóng Mực "trượt theo mép" vùng an toàn thay vì **dừng** như ticket ghi | đối chiếu lại câu "dừng nếu gặp vật cản" | `shadeMove(..., 'stop')` | — |
+| 3 | 4 test kỳ vọng sai: đọc tick khi game đã kết thúc; quên Bóng Mực hết choáng sẽ đuổi lại vào tầm; quên Tỏa Sáng (bước 7) chạy trước AI Gió Lạc (bước 8); vị trí 11.9999 được làm tròn thành 12 | đọc giá trị thực, **tính lại tay**, chỉ sửa test khi sim đúng theo ticket | sửa test kèm chú thích lý do | AGENTS.md: "kỳ vọng tính tay từ ticket" |
+| 4 | Bot demo thua cả 3 Đêm, rơi khỏi đảo khi né | mô phỏng headless 9 ván | dò mặt đất trước khi né | — |
+| 5 | FPS 25.8 < 30. Đoán ban đầu "do bloom" là **sai** | đo có kiểm soát 4 biến thể (bloom on/off × HUD on/off) | thủ phạm là ghi DOM mỗi khung → cache HUD → 43.6 FPS | quy tắc HUD trong AGENTS.md |
+| 6 | Ảnh Đêm 3 hiện menu | xem ảnh | do chờ chưa đủ lâu sau tua 60 s; tăng thời gian chờ | — |
+| 7 | Heredoc trong Bash bị lỗi phân tích (2 lần) | lỗi shell | ghi script ra file rồi chạy | — |
+
+### Token / chi phí (ước tính)
+- Đọc ticket (người dùng dán) + spec: ~15k input. Viết sim + test + renderer + docs: ~70k output.
+- Ngữ cảnh tích lũy cả phiên Phase 2 (gửi lại mỗi lượt, phần lớn cache): ước tính **~4–6 triệu token input**, **~80k output**. Số chính xác: `/cost`.
+- Cách tiết kiệm: sửa bằng script Python nhỏ thay vì đọc lại cả file lớn; một lần đo FPS có kiểm soát thay vì thử mò; dùng lại proof script/CI của Phase 1.
