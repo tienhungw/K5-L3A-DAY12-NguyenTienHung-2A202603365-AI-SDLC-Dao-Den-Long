@@ -71,7 +71,7 @@ await Promise.all([B.ready, P.ready]);
 const evaluate = async (expr) => (await P.send('Runtime.evaluate', { expression: expr, returnByValue: true })).result?.result?.value;
 await P.send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 720, deviceScaleFactor: 1, mobile: false });
 
-// RSS of the whole Chrome process tree (browser + GPU + renderer); sampled once per second
+// RSS of the whole Chrome process tree (browser + GPU + renderer)
 async function chromeRssMb() {
   try {
     const info = await B.send('SystemInfo.getProcessInfo');
@@ -88,12 +88,15 @@ async function chromeRssMb() {
 
 // 3. load the bench scene and wait for the measurement window to finish
 await P.send('Page.navigate', { url: `http://127.0.0.1:${port}/?bench&seed=${seed}&duration=${duration}${process.env.BENCH_EXTRA || ""}` });
-let peak = null;
+let peak = null, lastMem = 0;
 const deadline = Date.now() + (duration + 60) * 1000;
 for (;;) {
   await sleep(1000);
   const st = await evaluate('window.__bench ? { first: window.__bench.firstFrameEpoch, done: window.__bench.done, n: window.__bench.dts.length } : null');
-  if (!process.env.BENCH_NO_MEM && st?.first && (Date.now() - st.first) > 3000) { const m = await chromeRssMb(); if (m != null) peak = Math.max(peak ?? 0, m); }
+  // RSS sample every 5 s: spawning ps/PowerShell every second caused measurable frame hitches on Windows
+  if (!process.env.BENCH_NO_MEM && st?.first && (Date.now() - st.first) > 3000 && Date.now() - lastMem >= 5000) {
+    lastMem = Date.now(); const m = await chromeRssMb(); if (m != null) peak = Math.max(peak ?? 0, m);
+  }
   if (st?.done) break;
   if (Date.now() > deadline) { console.error('error: bench did not finish in time'); process.exit(1); }
 }
@@ -113,7 +116,7 @@ const report = {
   renderer: `three.js r${threeVer.split('.')[1]} WebGL2 in ${version} (${res.gpu})${headless ? ' [headless]' : ''}`,
   os: `${type()} ${release()} ${arch()} · ${cpus()[0]?.model?.trim()} x${cpus().length} · ${(totalmem() / 2 ** 30).toFixed(1)} GB RAM`,
   seed, duration_s: duration,
-  peak_mem_note: 'Sum of RSS (working set on Windows) of all Chrome processes (browser, GPU, renderer) sampled every 1 s during measurement.',
+  peak_mem_note: 'Sum of RSS (working set on Windows) of all Chrome processes (browser, GPU, renderer) sampled every 5 s during measurement.',
 };
 if (process.env.BENCH_DUMP) writeFileSync(process.env.BENCH_DUMP, JSON.stringify(res.dts)); // raw dt list (diagnostics)
 writeFileSync(out, JSON.stringify(report, null, 2) + '\n');

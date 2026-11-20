@@ -78,6 +78,13 @@ await shot('09-low-fuel', '/?seed=4&night=1', 2500, "document.getElementById('bt
 await shot('10-colorblind', '/?autoplay&seed=4&night=1&skip=100', 3000, "localStorage.setItem('ddl-settings', JSON.stringify({ volume: 0.7, sens: 0.6, colorblind: true })); location.reload()");
 await send('Runtime.evaluate', { expression: "localStorage.removeItem('ddl-settings')" });
 await shot('11-dawn-result', '/?autoplay&seed=5&night=1&skip=240', 2200);
+// Phase 4: accessibility + leaderboard + bench scene
+await shot('12-settings-keys', '/', 2000, "document.getElementById('btnSettingsMenu').click(); document.querySelectorAll('#keyList button')[4].click(); window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyE' }));");
+await shot('13-leaderboard', '/', 2000, "(async () => { for (const [name, score, n] of [['Mây_01', 1840, 3], ['Hưng', 1320, 2], ['Dang_99', 640, 1]]) await fetch('/api/leaderboard', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name, score, nights_won: n, seed: 42 }) }); document.getElementById('btnBoardMenu').click(); })()");
+await shot('14-captions-shade-arrow', '/?autoplay&seed=5&night=1&skip=4.9', 1800);
+await shot('15-big-text', '/?autoplay&seed=5&night=1&skip=30', 2500, "localStorage.setItem('ddl-settings', JSON.stringify({ bigText: true })); location.reload()");
+await send('Runtime.evaluate', { expression: "localStorage.removeItem('ddl-settings')" });
+await shot('16-bench-scene', '/?bench&seed=42&duration=5', 4500);
 
 // FPS: let the bot play Night 1 at 1280x720 and average per-second samples (first 3 s discarded as warm-up)
 await send('Page.navigate', { url: base + '/?autoplay&seed=4&night=1&fps' });
